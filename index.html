@@ -206,15 +206,16 @@ fetch(CSV_URL)
 
         const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
-        if(!colunas || colunas.length < 4) return;
+        if(!colunas || colunas.length < 5) return;
 
         const nome = colunas[0].replaceAll('"','').trim();
         const imagem = colunas[1].replaceAll('"','').trim();
         const preco = colunas[2].replaceAll('"','').trim();
         const link = colunas[3].replaceAll('"','').trim();
+        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
 
         document.getElementById("produtos").innerHTML += `
-        <div class="card">
+        <div class="card" data-categoria="${categoria}">
 
             <img src="${imagem}" alt="${nome}">
 
@@ -254,6 +255,33 @@ fetch(CSV_URL)
     `;
 
     console.error(error);
+
+});
+
+document.addEventListener("click", function(e){
+
+    if(!e.target.classList.contains("filtro")) return;
+
+    document.querySelectorAll(".filtro").forEach(btn=>{
+        btn.classList.remove("ativo");
+    });
+
+    e.target.classList.add("ativo");
+
+    const categoria = e.target.dataset.categoria;
+
+    document.querySelectorAll(".card").forEach(card=>{
+
+        if(
+            categoria === "todos" ||
+            card.dataset.categoria === categoria
+        ){
+            card.style.display = "block";
+        }else{
+            card.style.display = "none";
+        }
+
+    });
 
 });
 
