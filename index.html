@@ -20,28 +20,51 @@ body{
 }
 
 header{
-    background:#f5e6d3;
-    padding:30px;
+    background:#F4E7DA;
+    padding:35px 20px;
     text-align:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
 }
 
 .logo{
-    width:140px;
+    width:220px;
+    max-width:90%;
     height:auto;
     display:block;
     margin:0 auto 15px;
 }
 
 .titulo-site{
-    font-size:32px;
-    font-weight:bold;
-    color:#8d4e2d;
+    font-size:34px;
+    font-weight:700;
+    color:#a35732;
+    letter-spacing:1px;
 }
 
 .subtitulo{
     color:#6b5b4f;
-    margin-top:8px;
+    margin-top:10px;
+    font-size:16px;
+}
+
+.banner{
+    background:white;
+    max-width:1100px;
+    margin:30px auto;
+    padding:30px;
+    text-align:center;
+    border-radius:15px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+
+.banner h2{
+    color:#a35732;
+    margin-bottom:12px;
+}
+
+.banner p{
+    color:#666;
+    line-height:1.5;
 }
 
 .container{
@@ -65,7 +88,8 @@ header{
 }
 
 .card:hover{
-    transform:translateY(-5px);
+    transform:translateY(-6px);
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
 }
 
 .card img{
@@ -100,22 +124,6 @@ header{
     margin-top:4px;
 }
 
-.botao{
-    display:block;
-    text-align:center;
-    background:#3483fa;
-    color:white;
-    text-decoration:none;
-    padding:14px;
-    border-radius:10px;
-    margin-top:16px;
-    font-weight:bold;
-}
-
-.botao:hover{
-    background:#2968c8;
-}
-
 .selo{
     background:#00a650;
     color:white;
@@ -124,6 +132,23 @@ header{
     border-radius:20px;
     font-size:12px;
     margin-bottom:10px;
+}
+
+.botao{
+    display:block;
+    text-align:center;
+    background:#a35732;
+    color:white;
+    text-decoration:none;
+    padding:14px;
+    border-radius:10px;
+    margin-top:16px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.botao:hover{
+    background:#8b4728;
 }
 
 footer{
@@ -140,7 +165,7 @@ footer{
 
 <header>
 
-    <img src="logo.png" alt="Lar Prático" class="logo">
+    <img src="Logo.png" alt="Lar Prático" class="logo">
 
     <div class="titulo-site">
         Lar Prático
@@ -151,6 +176,13 @@ footer{
     </p>
 
 </header>
+
+<section class="banner">
+    <h2>🏠 Soluções práticas para sua casa</h2>
+    <p>
+        Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
+    </p>
+</section>
 
 <div class="container">
     <div id="produtos" class="produtos"></div>
@@ -210,7 +242,6 @@ fetch(CSV_URL)
 
         </div>
         `;
-
     });
 
 })
