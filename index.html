@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ofertas Mercado Livre</title>
+<title>Lar Prático | Ofertas Selecionadas</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -14,39 +15,44 @@
 }
 
 body{
+    background:#f3f4f6;
     font-family:Arial, Helvetica, sans-serif;
-    background:#f5f5f5;
 }
 
 header{
     background:#ffe600;
-    padding:20px;
+    padding:25px;
     text-align:center;
-    box-shadow:0 2px 5px rgba(0,0,0,.1);
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
 header h1{
     color:#333;
+    margin-bottom:5px;
+}
+
+header p{
+    color:#666;
 }
 
 .container{
     max-width:1200px;
     margin:auto;
-    padding:20px;
+    padding:25px;
 }
 
 .produtos{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:20px;
+    gap:24px;
 }
 
 .card{
     background:#fff;
-    border-radius:12px;
+    border-radius:15px;
     overflow:hidden;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    transition:0.3s;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+    transition:.2s ease;
 }
 
 .card:hover{
@@ -57,18 +63,32 @@ header h1{
     width:100%;
     height:250px;
     object-fit:contain;
-    background:#fff;
-    padding:10px;
+    background:white;
+    padding:15px;
 }
 
 .info{
-    padding:15px;
+    padding:18px;
 }
 
 .info h3{
     font-size:16px;
     line-height:1.4;
     min-height:70px;
+    color:#333;
+}
+
+.preco{
+    font-size:28px;
+    color:#00a650;
+    font-weight:bold;
+    margin-top:12px;
+}
+
+.parcela{
+    font-size:13px;
+    color:#777;
+    margin-top:4px;
 }
 
 .botao{
@@ -77,33 +97,55 @@ header h1{
     background:#3483fa;
     color:white;
     text-decoration:none;
-    padding:12px;
-    border-radius:8px;
-    margin-top:15px;
+    padding:14px;
+    border-radius:10px;
+    margin-top:16px;
     font-weight:bold;
 }
 
 .botao:hover{
     background:#2968c8;
 }
+
+.selo{
+    background:#00a650;
+    color:white;
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+footer{
+    text-align:center;
+    padding:30px;
+    color:#777;
+}
+
 </style>
 </head>
 <body>
 
 <header>
-    <h1>🔥 Ofertas Selecionadas</h1>
+    <h1>🔥 Lar Prático</h1>
+    <p>Ofertas selecionadas do Mercado Livre</p>
 </header>
 
 <div class="container">
     <div id="produtos" class="produtos"></div>
 </div>
 
+<footer>
+    Alguns links podem gerar comissão de afiliado sem custo adicional para você.
+</footer>
+
 <script>
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
 
 fetch(CSV_URL)
-.then(response => response.text())
+.then(resp => resp.text())
 .then(data => {
 
     const linhas = data.trim().split("\n").slice(1);
@@ -112,30 +154,44 @@ fetch(CSV_URL)
 
         const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
-        if(!colunas || colunas.length < 3) return;
+        if(!colunas || colunas.length < 4) return;
 
-        const nome = colunas[0].replace(/"/g, '').trim();
-        const imagem = colunas[1].replace(/"/g, '').trim();
-        const link = colunas[2].replace(/"/g, '').trim();
+        const nome = colunas[0].replaceAll('"','').trim();
+        const imagem = colunas[1].replaceAll('"','').trim();
+        const preco = colunas[2].replaceAll('"','').trim();
+        const link = colunas[3].replaceAll('"','').trim();
 
         document.getElementById("produtos").innerHTML += `
-            <div class="card">
-                <img src="${imagem}" alt="${nome}">
-                <div class="info">
-                    <h3>${nome}</h3>
-                    <a href="${link}" target="_blank" class="botao">
-                        Ver Oferta
-                    </a>
+        <div class="card">
+
+            <img src="${imagem}" alt="${nome}">
+
+            <div class="info">
+
+                <div class="selo">
+                    Oferta
                 </div>
+
+                <h3>${nome}</h3>
+
+                <div class="preco">
+                    ${preco}
+                </div>
+
+                <div class="parcela">
+                    Confira disponibilidade no Mercado Livre
+                </div>
+
+                <a href="${link}" target="_blank" class="botao">
+                    🛒 Ver Oferta
+                </a>
+
             </div>
+
+        </div>
         `;
     });
 
-})
-.catch(error => {
-    document.getElementById("produtos").innerHTML =
-    "<p>Erro ao carregar produtos.</p>";
-    console.error(error);
 });
 
 </script>
