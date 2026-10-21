@@ -247,6 +247,7 @@ footer{
 <script>
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
+
 fetch(CSV_URL)
 .then(resp => resp.text())
 .then(data => {
@@ -313,7 +314,7 @@ document.addEventListener("click", function(e){
 
     if(!e.target.classList.contains("filtro")) return;
 
-    document.querySelectorAll(".filtro").forEach(btn=>{
+    document.querySelectorAll(".filtro").forEach(btn => {
         btn.classList.remove("ativo");
     });
 
@@ -321,13 +322,13 @@ document.addEventListener("click", function(e){
 
     const categoria = e.target.dataset.categoria;
 
-    document.querySelectorAll(".card").forEach(card=>{
+    document.querySelectorAll(".card").forEach(card => {
 
         if(
             categoria === "todos" ||
             card.dataset.categoria === categoria
         ){
-            card.style.display = "block";
+            card.style.display = "";
         }else{
             card.style.display = "none";
         }
