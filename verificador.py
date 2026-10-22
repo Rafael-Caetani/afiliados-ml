@@ -88,11 +88,12 @@ if novos_registros:
         ignore_index=True
     )
 
-    historico.to_csv(
-        HISTORICO,
-        index=False,
-        encoding="utf-8-sig"
-    )
+historico.to_csv(
+    HISTORICO,
+    index=False,
+    encoding="utf-8-sig"
+)
+
 
 # Gera relatório
 with open(
