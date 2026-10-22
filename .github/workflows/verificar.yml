@@ -1,54 +1,21 @@
-name: Verificar Produtos
+import pandas as pd
 
-permissions:
-  contents: write
+url = "CSV_PUBLICO"
 
-on:
-  workflow_dispatch:
+df = pd.read_csv(url)
 
-  schedule:
-    - cron: '0 9 * * *'
+produtos = []
 
-jobs:
-  verificar:
-    runs-on: ubuntu-latest
+for _, row in df.iterrows():
+    produtos.append({
+        "nome": row["Nome"],
+        "categoria": row["Categoria"],
+        "preco": row["Preço"],
+        "imagem": row["Imagem"],
+        "link": row["Link"]
+    })
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+import json
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Listar arquivos
-        run: |
-          ls -la
-
-      - name: Executar verificador
-        run: |
-          python verificador.py
-
-      - name: Commit do relatorio
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          git add relatorio_integridade.md
-
-          if git diff --staged --quiet; then
-            echo "Nenhuma alteracao encontrada"
-            exit 0
-          fi
-
-          git commit -m "Atualizacao automatica do relatorio"
-
-          git pull --rebase origin main
-
-          git push origin main
+with open("produtos.json", "w", encoding="utf-8") as f:
+    json.dump(produtos, f, ensure_ascii=False, indent=2)
