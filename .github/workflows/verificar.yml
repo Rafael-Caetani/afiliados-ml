@@ -34,11 +34,11 @@ jobs:
         run: |
           ls -la
 
-      - name: Executar verificador
+           - name: Executar verificador
         run: |
           python verificador.py
 
-          - name: Commit do relatorio
+      - name: Commit do relatorio
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
