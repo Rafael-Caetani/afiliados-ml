@@ -1,4 +1,19 @@
-[
+a[
+  {
+    "nome": "Prateleira Organizadora",
+    "categoria": "Organização",
+    "preco": 89.90,
+    "imagem": "https://...",
+    "link": "https://..."
+  },
+  {
+    "nome": "Escorredor Retrátil",
+    "categoria": "Cozinha",
+    "preco": 59.90,
+    "imagem": "https://...",
+    "link": "https://..."
+  }
+][
   {
     "nome": "Prateleira Organizadora",
     "categoria": "Organização",
