@@ -38,13 +38,20 @@ jobs:
         run: |
           python verificador.py
 
-      - name: Commit do relatorio
+          - name: Commit do relatorio
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
           git add relatorio_integridade.md
 
-          git diff --staged --quiet || git commit -m "Atualizacao automatica do relatorio"
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteracao encontrada"
+            exit 0
+          fi
 
-          git push
+          git commit -m "Atualizacao automatica do relatorio"
+
+          git pull --rebase origin main
+
+          git push origin main
