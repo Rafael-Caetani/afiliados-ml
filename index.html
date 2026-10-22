@@ -308,6 +308,7 @@ footer{
             <select id="ordenacao" class="select-ordenacao" onchange="aplicarFiltros()">
                 <option value="padrao">Padrão</option>
                 <option value="az">A - Z</option>
+                <option value="menor-maior">Valor: Menor para Maior</option>
                 <option value="maior-menor">Valor: Maior para Menor</option>
             </select>
         </div>
@@ -401,8 +402,12 @@ function aplicarFiltros() {
             const nomeB = b.querySelector("h3").innerText.toLowerCase();
             return nomeA.localeCompare(nomeB);
         } 
+        else if (criterioOrdenacao === "menor-maior") {
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoA - precoB; // Do menor para o maior
+        }
         else if (criterioOrdenacao === "maior-menor") {
-            // Converte o texto do preço (ex: "R$ 150,00") para número puro (150.00)
             const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
             const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
             return precoB - precoA; // Do maior para o menor
