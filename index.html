@@ -464,7 +464,6 @@ footer{
         <!-- Esquerda: Logotipo e Título -->
         <div class="header-esquerda">
             <div class="logo-container">
-                <!-- ATENÇÃO: Se a sua logo for .png, altere para Logo.png -->
                 <img src="Logo.png" alt="Lar Prático" class="logo">
             </div>
             <div class="titulo-area">
@@ -638,7 +637,7 @@ function aplicarFiltros() {
 
     const contador = document.getElementById("contador");
     if(contador){
-        const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteIntens || limiteItens);
+        const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteItens);
         contador.innerText = `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
     }
 }
@@ -656,7 +655,8 @@ fetch(CSV_URL)
     const linhas = data.trim().split("\n").slice(1);
 
     linhas.forEach(linha => {
-        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        // Tratamento seguro para quebrar as colunas do CSV
+        const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         if(!colunas || colunas.length < 5) return;
 
         const nome = colunas[0].replaceAll('"','').trim();
