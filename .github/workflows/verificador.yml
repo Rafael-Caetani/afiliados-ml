@@ -1,0 +1,42 @@
+name: Verificar Produtos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Executar verificador
+        run: |
+          python verificador.py
+
+      - name: Commit arquivos
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add relatorio_integridade.md historico_precos.csv
+
+          if git diff --staged --quiet; then
+            echo "Sem alteracoes"
+            exit 0
+          fi
+
+          git commit -m "Atualizacao automatica"
+
+          git push
