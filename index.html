@@ -464,7 +464,8 @@ footer{
         <!-- Esquerda: Logotipo e Título -->
         <div class="header-esquerda">
             <div class="logo-container">
-                <img src="Logo.jpg" alt="Lar Prático" class="logo">
+                <!-- ATENÇÃO: Se a sua logo for .png, altere para Logo.png -->
+                <img src="Logo.png" alt="Lar Prático" class="logo">
             </div>
             <div class="titulo-area">
                 <h1>Lar Prático</h1>
@@ -606,4 +607,118 @@ function aplicarFiltros() {
         const texto = produto.innerText.toLowerCase();
         const atendePesquisa = texto.includes(filtro);
         const atendeCategoria =
-            categoriaSelecionada === "
+            categoriaSelecionada === "todos" ||
+            produto.dataset.categoria === categoriaSelecionada;
+
+        if(atendePesquisa && atendeCategoria){
+            visiveis++;
+            
+            if (!estaFiltrando) {
+                if (exibidosContador < limiteItens) {
+                    produto.style.display = "";
+                    exibidosContador++;
+                } else {
+                    produto.style.display = "none";
+                }
+            } else {
+                produto.style.display = "";
+            }
+        } else {
+            produto.style.display = "none";
+        }
+    });
+
+    cards.forEach(card => containerProdutos.appendChild(card));
+
+    if (!estaFiltrando && visiveis > limiteItens) {
+        containerBtnMais.style.display = "block";
+    } else {
+        containerBtnMais.style.display = "none";
+    }
+
+    const contador = document.getElementById("contador");
+    if(contador){
+        const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteIntens || limiteItens);
+        contador.innerText = `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
+    }
+}
+
+function carregarMais() {
+    limiteItens += incrementoLote;
+    aplicarFiltros();
+}
+
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
+
+fetch(CSV_URL)
+.then(resp => resp.text())
+.then(data => {
+    const linhas = data.trim().split("\n").slice(1);
+
+    linhas.forEach(linha => {
+        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        if(!colunas || colunas.length < 5) return;
+
+        const nome = colunas[0].replaceAll('"','').trim();
+        const imagem = colunas[1].replaceAll('"','').trim();
+        const preco = colunas[2].replaceAll('"','').trim();
+        const link = colunas[3].replaceAll('"','').trim();
+        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
+
+        const textoMsg = encodeURIComponent(`🔥 Olha essa oferta imperdível no Lar Prático!\n\n*${nome}*\nPor apenas *${preco}*\n\nConfira aqui: ${link}`);
+
+        document.getElementById("produtos").innerHTML += `
+            <div class="card produto" data-categoria="${categoria}">
+                <img src="${imagem}" alt="${nome}">
+                <div class="info">
+                    <div class="selo">
+                        Oferta Especial
+                    </div>
+                    <h3>${nome}</h3>
+                    <div class="preco">
+                        ${preco}
+                    </div>
+                    <div class="parcela">
+                        Confira disponibilidade e condições atualizadas
+                    </div>
+                    <div class="botoes-acao">
+                        <a href="${link}" target="_blank" class="botao">
+                            🛒 Ver Oferta
+                        </a>
+                        <a href="https://api.whatsapp.com/send?text=${textoMsg}" target="_blank" class="botao-whatsapp" title="Compartilhar no WhatsApp">
+                            💬
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    aplicarFiltros();
+})
+.catch(error => {
+    document.getElementById("produtos").innerHTML = `
+        <p style="text-align:center;color:red;">
+            Não foi possível carregar os produtos.
+        </p>
+    `;
+    console.error(error);
+});
+
+document.addEventListener("click", function(e){
+    if(!e.target.classList.contains("filtro")) return;
+
+    document.querySelectorAll(".filtro")
+        .forEach(btn => btn.classList.remove("ativo"));
+
+    e.target.classList.add("ativo");
+
+    categoriaSelecionada = e.target.dataset.categoria;
+    limiteItens = 12; 
+
+    aplicarFiltros();
+});
+</script>
+
+</body>
+</html>
