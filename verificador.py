@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # URL da sua planilha publicada
-CSV_URL = "COLE_AQUI_O_LINK_CSV"
+CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pubhtml"
 
 # Arquivos locais
 HISTORICO = "historico_precos.csv"
