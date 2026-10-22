@@ -21,34 +21,105 @@ body{
     min-height: 100vh;
 }
 
-header{
-    background:#F4E7DA;
-    padding:35px 20px;
-    text-align:center;
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
+/* Novo Cabeçalho Profissional */
+header {
+    background: linear-gradient(135deg, #f4e7da 0%, #e6d2be 100%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     position: relative;
     z-index: 10;
+    padding: 15px 30px;
+}
+
+.header-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-container {
+    background: #fff;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .logo{
-    width:220px;
-    max-width:90%;
-    height:auto;
-    display:block;
-    margin:0 auto 15px;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    border-radius: 50%;
 }
 
-.titulo-site{
-    font-size:34px;
-    font-weight:700;
-    color:#a35732;
-    letter-spacing:1px;
+.titulo-area h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #a35732;
+    letter-spacing: 0.5px;
 }
 
-.subtitulo{
-    color:#6b5b4f;
-    margin-top:10px;
-    font-size:16px;
+.titulo-area p {
+    color: #6b5b4f;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Navegação do Cabeçalho */
+.header-nav {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+}
+
+.header-nav a {
+    text-decoration: none;
+    color: #6b5b4f;
+    font-weight: 600;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.header-nav a:hover, .header-nav a.ativo {
+    color: #a35732;
+}
+
+/* Ações do Cabeçalho (Conta, Favoritos) */
+.header-acoes {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.acao-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #6b5b4f;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.acao-item:hover {
+    color: #a35732;
+}
+
+.acao-item span {
+    font-size: 20px;
+    margin-bottom: 2px;
 }
 
 /* Layout Principal com Sidebar */
@@ -339,24 +410,63 @@ footer{
     .filtros {
         max-height: 250px;
     }
+    .header-container {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .header-esquerda {
+        flex-direction: column;
+    }
+    .header-nav {
+        justify-content: center;
+    }
+    .header-acoes {
+        justify-content: center;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- Cabeçalho Profissional Integrado -->
 <header>
-    <img src="Logo.png" alt="Lar Prático" class="logo">
-    <div class="titulo-site">
-        Lar Prático
+    <div class="header-container">
+        <!-- Esquerda: Logotipo e Título -->
+        <div class="header-esquerda">
+            <div class="logo-container">
+                <img src="Logo.jpg" alt="Lar Prático" class="logo">
+            </div>
+            <div class="titulo-area">
+                <h1>Lar Prático</h1>
+                <p>Produtos selecionados para facilitar seu dia a dia</p>
+            </div>
+        </div>
+
+        <!-- Centro: Menu de Navegação Rápida -->
+        <ul class="header-nav">
+            <li><a href="#" class="ativo">Início</a></li>
+            <li><a href="#produtos">Ofertas</a></li>
+            <li><a href="#">Sobre Nós</a></li>
+        </ul>
+
+        <!-- Direita: Atalhos de Conta e Favoritos -->
+        <div class="header-acoes">
+            <a href="#" class="acao-item">
+                <span>👤</span>
+                Minha Conta
+            </a>
+            <a href="#" class="acao-item">
+                <span>❤️</span>
+                Favoritos
+            </a>
+        </div>
     </div>
-    <p class="subtitulo">
-        Produtos selecionados para facilitar seu dia a dia
-    </p>
 </header>
 
 <div class="layout-principal">
-    <!-- Menu Lateral Esquerdo -->
+    <!-- Menu Lateral Esquerdo com rolagem independente -->
     <aside class="sidebar">
         <!-- Seção de Ordenação -->
         <div class="sidebar-section">
@@ -369,7 +479,7 @@ footer{
             </select>
         </div>
 
-        <!-- Seção de Categorias com Rolagem Independente -->
+        <!-- Seção de Categorias -->
         <div class="sidebar-section">
             <h3>Categorias</h3>
             <div class="filtros">
@@ -400,3 +510,179 @@ footer{
             <h2>🏠 Soluções práticas para sua casa</h2>
             <p>
                 Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
+            </p>
+        </section>
+
+        <div class="busca-container">
+            <input
+                type="text"
+                id="pesquisa"
+                placeholder="🔎 Pesquise um produto..."
+                onkeyup="aplicarFiltros()"
+            >
+        </div>
+
+        <div id="contador" class="contador"></div>
+
+        <div id="produtos" class="produtos"></div>
+
+        <!-- Botão Mostrar Mais -->
+        <div id="container-mostrar-mais" class="container-mostrar-mais" style="display: none;">
+            <button id="btn-mostrar-mais" onclick="carregarMais()">Mostrar Mais</button>
+        </div>
+    </main>
+</div>
+
+<footer>
+    Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
+</footer>
+
+<script>
+let categoriaSelecionada = "todos";
+let limiteItens = 12; 
+const incrementoLote = 12; 
+
+function aplicarFiltros() {
+    const filtro = document.getElementById("pesquisa").value.toLowerCase();
+    const criterioOrdenacao = document.getElementById("ordenacao").value;
+    const containerProdutos = document.getElementById("produtos");
+    const containerBtnMais = document.getElementById("container-mostrar-mais");
+    
+    const cards = Array.from(containerProdutos.querySelectorAll(".card"));
+    
+    let visiveis = 0;
+    let exibidosContador = 0;
+    
+    const estaFiltrando = filtro !== "" || categoriaSelecionada !== "todos";
+
+    cards.sort((a, b) => {
+        if (criterioOrdenacao === "az") {
+            const nomeA = a.querySelector("h3").innerText.toLowerCase();
+            const nomeB = b.querySelector("h3").innerText.toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        } 
+        else if (criterioOrdenacao === "menor-maior") {
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoA - precoB;
+        }
+        else if (criterioOrdenacao === "maior-menor") {
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoB - precoA;
+        }
+        return 0;
+    });
+
+    cards.forEach(produto => {
+        const texto = produto.innerText.toLowerCase();
+        const atendePesquisa = texto.includes(filtro);
+        const atendeCategoria =
+            categoriaSelecionada === "todos" ||
+            produto.dataset.categoria === categoriaSelecionada;
+
+        if(atendePesquisa && atendeCategoria){
+            visiveis++;
+            
+            if (!estaFiltrando) {
+                if (exibidosContador < limiteItens) {
+                    produto.style.display = "";
+                    exibidosContador++;
+                } else {
+                    produto.style.display = "none";
+                }
+            } else {
+                produto.style.display = "";
+            }
+        } else {
+            produto.style.display = "none";
+        }
+    });
+
+    cards.forEach(card => containerProdutos.appendChild(card));
+
+    if (!estaFiltrando && visiveis > limiteItens) {
+        containerBtnMais.style.display = "block";
+    } else {
+        containerBtnMais.style.display = "none";
+    }
+
+    const contador = document.getElementById("contador");
+    if(contador){
+        const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteItens);
+        contador.innerText = `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
+    }
+}
+
+function carregarMais() {
+    limiteItens += incrementoLote;
+    aplicarFiltros();
+}
+
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
+
+fetch(CSV_URL)
+.then(resp => resp.text())
+.then(data => {
+    const linhas = data.trim().split("\n").slice(1);
+
+    linhas.forEach(linha => {
+        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        if(!colunas || colunas.length < 5) return;
+
+        const nome = colunas[0].replaceAll('"','').trim();
+        const imagem = colunas[1].replaceAll('"','').trim();
+        const preco = colunas[2].replaceAll('"','').trim();
+        const link = colunas[3].replaceAll('"','').trim();
+        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
+
+        document.getElementById("produtos").innerHTML += `
+            <div class="card produto" data-categoria="${categoria}">
+                <img src="${imagem}" alt="${nome}">
+                <div class="info">
+                    <div class="selo">
+                        Oferta Especial
+                    </div>
+                    <h3>${nome}</h3>
+                    <div class="preco">
+                        ${preco}
+                    </div>
+                    <div class="parcela">
+                        Confira disponibilidade e condições atualizadas
+                    </div>
+                    <a href="${link}" target="_blank" class="botao">
+                        🛒 Ver Oferta
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+
+    aplicarFiltros();
+})
+.catch(error => {
+    document.getElementById("produtos").innerHTML = `
+        <p style="text-align:center;color:red;">
+            Não foi possível carregar os produtos.
+        </p>
+    `;
+    console.error(error);
+});
+
+document.addEventListener("click", function(e){
+    if(!e.target.classList.contains("filtro")) return;
+
+    document.querySelectorAll(".filtro")
+        .forEach(btn => btn.classList.remove("ativo"));
+
+    e.target.classList.add("ativo");
+
+    categoriaSelecionada = e.target.dataset.categoria;
+    limiteItens = 12; 
+
+    aplicarFiltros();
+});
+</script>
+
+</body>
+</html>
