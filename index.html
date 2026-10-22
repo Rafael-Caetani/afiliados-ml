@@ -7,39 +7,18 @@
 <title>Lar Prático | Ofertas Selecionadas</title>
 
 <style>
-.contador{
-    text-align:center;
-    color:#666;
-    margin-bottom:20px;
-    font-size:14px;
-    font-weight:600;
-}
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
-.busca-container{
-    max-width:700px;
-    margin:20px auto;
-    padding:0 20px;
-}
 
-#pesquisa{
-    width:100%;
-    padding:15px;
-    border-radius:10px;
-    border:1px solid #ddd;
-    font-size:16px;
-    outline:none;
-}
-
-#pesquisa:focus{
-    border-color:#a35732;
-}
 body{
     background:#f3f4f6;
     font-family:Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header{
@@ -47,6 +26,8 @@ header{
     padding:35px 20px;
     text-align:center;
     box-shadow:0 2px 10px rgba(0,0,0,.08);
+    position: relative;
+    z-index: 10;
 }
 
 .logo{
@@ -70,14 +51,105 @@ header{
     font-size:16px;
 }
 
+/* Layout Principal com Sidebar */
+.layout-principal {
+    display: flex;
+    flex: 1;
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 25px;
+    gap: 30px;
+}
+
+/* Menu Lateral (Sidebar) */
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar h3 {
+    color: #a35732;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.filtros{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro{
+    border: none;
+    background: transparent;
+    color: #6b5b4f;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: left;
+    transition: .2s;
+    font-size: 14px;
+}
+
+.filtro:hover{
+    background: #F4E7DA;
+    color: #a35732;
+}
+
+.filtro.ativo{
+    background: #a35732;
+    color: #fff;
+}
+
+/* Conteúdo Principal */
+.conteudo-principal {
+    flex: 1;
+}
+
+.contador{
+    text-align: left;
+    color:#666;
+    margin-bottom:20px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.busca-container{
+    margin-bottom: 20px;
+}
+
+#pesquisa{
+    width:100%;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:16px;
+    outline:none;
+    background: #fff;
+}
+
+#pesquisa:focus{
+    border-color:#a35732;
+}
+
 .banner{
     background:white;
-    max-width:1100px;
-    margin:30px auto;
     padding:30px;
     text-align:center;
     border-radius:15px;
     box-shadow:0 2px 12px rgba(0,0,0,.08);
+    margin-bottom: 30px;
 }
 
 .banner h2{
@@ -90,43 +162,9 @@ header{
     line-height:1.5;
 }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:25px;
-}
-.filtros{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:center;
-    margin-bottom:30px;
-}
-
-.filtro{
-    border:none;
-    background:#fff;
-    color:#a35732;
-    padding:10px 18px;
-    border-radius:30px;
-    cursor:pointer;
-    font-weight:bold;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-    transition:.2s;
-}
-
-.filtro:hover{
-    background:#a35732;
-    color:#fff;
-}
-
-.filtro.ativo{
-    background:#a35732;
-    color:#fff;
-}
 .produtos{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
     gap:24px;
 }
 
@@ -209,79 +247,90 @@ footer{
     font-size:14px;
 }
 
+/* Responsividade para telas menores (celulares) */
+@media (max-width: 768px) {
+    .layout-principal {
+        flex-direction: column;
+        padding: 15px;
+    }
+    .sidebar {
+        width: 100%;
+        position: relative;
+        top: 0;
+    }
+}
 </style>
 </head>
 
 <body>
 
 <header>
-
     <img src="Logo.png" alt="Lar Prático" class="logo">
-
     <div class="titulo-site">
         Lar Prático
     </div>
-
     <p class="subtitulo">
         Produtos selecionados para facilitar seu dia a dia
     </p>
-
 </header>
 
-<section class="banner">
-    <h2>🏠 Soluções práticas para sua casa</h2>
-    <p>
-        Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
-    </p>
-</section>
-<div class="busca-container">
-    <input
-        type="text"
-        id="pesquisa"
-        placeholder="🔎 Pesquise um produto..."
-       onkeyup="aplicarFiltros()"
-    >
-</div>
-    <div id="contador" class="contador"></div>
-<div class="container">
+<div class="layout-principal">
+    <!-- Menu Lateral Esquerdo -->
+    <aside class="sidebar">
+        <h3>Categorias</h3>
+        <div class="filtros">
+            <button class="filtro ativo" data-categoria="todos">Todos</button>
+            <button class="filtro" data-categoria="automotivo">Automotivo</button>
+            <button class="filtro" data-categoria="beleza">Beleza</button>
+            <button class="filtro" data-categoria="casa">Casa</button>
+            <button class="filtro" data-categoria="cozinha">Cozinha</button>
+            <button class="filtro" data-categoria="decoracao">Decoração</button>
+            <button class="filtro" data-categoria="eletrodomesticos">Eletrodomésticos</button>
+            <button class="filtro" data-categoria="ferramentas">Ferramentas</button>
+            <button class="filtro" data-categoria="fitness">Fitness</button>
+            <button class="filtro" data-categoria="iluminacao">Iluminação</button>
+            <button class="filtro" data-categoria="lazer">Lazer</button>
+            <button class="filtro" data-categoria="livros">Livros</button>
+            <button class="filtro" data-categoria="moda">Moda</button>
+            <button class="filtro" data-categoria="moveis">Móveis</button>
+            <button class="filtro" data-categoria="pets">Pets</button>
+            <button class="filtro" data-categoria="saude">Saúde</button>
+            <button class="filtro" data-categoria="tecnologia">Tecnologia</button>
+        </div>
+    </aside>
 
-    <div class="filtros">
+    <!-- Conteúdo Principal -->
+    <main class="conteudo-principal">
+        <section class="banner">
+            <h2>🏠 Soluções práticas para sua casa</h2>
+            <p>
+                Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
+            </p>
+        </section>
 
-        <button class="filtro ativo" data-categoria="todos">Todos</button>
-        <button class="filtro" data-categoria="casa">Casa</button>
-        <button class="filtro" data-categoria="cozinha">Cozinha</button>
-        <button class="filtro" data-categoria="decoracao">Decoração</button>
-        <button class="filtro" data-categoria="moveis">Móveis</button>
-        <button class="filtro" data-categoria="tecnologia">Tecnologia</button>
-        <button class="filtro" data-categoria="ferramentas">Ferramentas</button>
-        <button class="filtro" data-categoria="iluminacao">Iluminação</button>
-        <button class="filtro" data-categoria="eletrodomesticos">Eletrodomésticos</button>
-        <button class="filtro" data-categoria="beleza">Beleza</button>
-        <button class="filtro" data-categoria="saude">Saúde</button>
-        <button class="filtro" data-categoria="fitness">Fitness</button>
-        <button class="filtro" data-categoria="automotivo">Automotivo</button>
-        <button class="filtro" data-categoria="pets">Pets</button>
-        <button class="filtro" data-categoria="lazer">Lazer</button>
-        <button class="filtro" data-categoria="moda">Moda</button>
-        <button class="filtro" data-categoria="livros">Livros</button>
+        <div class="busca-container">
+            <input
+                type="text"
+                id="pesquisa"
+                placeholder="🔎 Pesquise um produto..."
+                onkeyup="aplicarFiltros()"
+            >
+        </div>
 
-    </div>
+        <div id="contador" class="contador"></div>
 
-    <div id="produtos" class="produtos"></div>
-
+        <div id="produtos" class="produtos"></div>
+    </main>
 </div>
 
 <footer>
     Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
 </footer>
 
-
 <script>
-
 let categoriaSelecionada = "todos";
 
 function aplicarFiltros() {
-
     const filtro = document
         .getElementById("pesquisa")
         .value
@@ -291,32 +340,23 @@ function aplicarFiltros() {
 
     document.querySelectorAll(".produto")
         .forEach(produto => {
+            const texto = produto.innerText.toLowerCase();
+            const atendePesquisa = texto.includes(filtro);
+            const atendeCategoria =
+                categoriaSelecionada === "todos" ||
+                produto.dataset.categoria === categoriaSelecionada;
 
-        const texto =
-            produto.innerText.toLowerCase();
+            if(atendePesquisa && atendeCategoria){
+                produto.style.display = "";
+                visiveis++;
+            }else{
+                produto.style.display = "none";
+            }
+        });
 
-        const atendePesquisa =
-            texto.includes(filtro);
-
-        const atendeCategoria =
-            categoriaSelecionada === "todos" ||
-            produto.dataset.categoria === categoriaSelecionada;
-
-        if(atendePesquisa && atendeCategoria){
-            produto.style.display = "";
-            visiveis++;
-        }else{
-            produto.style.display = "none";
-        }
-
-    });
-
-    const contador =
-        document.getElementById("contador");
-
+    const contador = document.getElementById("contador");
     if(contador){
-        contador.innerText =
-            `${visiveis} produto(s) encontrado(s)`;
+        contador.innerText = `${visiveis} produto(s) encontrado(s)`;
     }
 }
 
@@ -325,83 +365,52 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttx
 fetch(CSV_URL)
 .then(resp => resp.text())
 .then(data => {
-
     const linhas = data.trim().split("\n").slice(1);
 
     linhas.forEach(linha => {
-
-        const colunas =
-            linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-
+        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
         if(!colunas || colunas.length < 5) return;
 
-        const nome =
-            colunas[0].replaceAll('"','').trim();
-
-        const imagem =
-            colunas[1].replaceAll('"','').trim();
-
-        const preco =
-            colunas[2].replaceAll('"','').trim();
-
-        const link =
-            colunas[3].replaceAll('"','').trim();
-
-        const categoria =
-            colunas[4]
-            .replaceAll('"','')
-            .trim()
-            .toLowerCase();
+        const nome = colunas[0].replaceAll('"','').trim();
+        const imagem = colunas[1].replaceAll('"','').trim();
+        const preco = colunas[2].replaceAll('"','').trim();
+        const link = colunas[3].replaceAll('"','').trim();
+        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
 
         document.getElementById("produtos").innerHTML += `
             <div class="card produto" data-categoria="${categoria}">
-
                 <img src="${imagem}" alt="${nome}">
-
                 <div class="info">
-
                     <div class="selo">
                         Oferta Especial
                     </div>
-
                     <h3>${nome}</h3>
-
                     <div class="preco">
                         ${preco}
                     </div>
-
                     <div class="parcela">
                         Confira disponibilidade e condições atualizadas
                     </div>
-
                     <a href="${link}" target="_blank" class="botao">
                         🛒 Ver Oferta
                     </a>
-
                 </div>
-
             </div>
         `;
-
     });
 
     aplicarFiltros();
-
 })
 .catch(error => {
-
     document.getElementById("produtos").innerHTML = `
         <p style="text-align:center;color:red;">
             Não foi possível carregar os produtos.
         </p>
     `;
-
     console.error(error);
-
 });
 
 document.addEventListener("click", function(e){
-
     if(!e.target.classList.contains("filtro")) return;
 
     document.querySelectorAll(".filtro")
@@ -409,15 +418,11 @@ document.addEventListener("click", function(e){
 
     e.target.classList.add("ativo");
 
-    categoriaSelecionada =
-        e.target.dataset.categoria;
+    categoriaSelecionada = e.target.dataset.categoria;
 
     aplicarFiltros();
-
 });
-
 </script>
-
 
 </body>
 </html>
