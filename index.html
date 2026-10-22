@@ -120,9 +120,9 @@ header{
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 320px; /* Altura limite para ativar a barra de rolagem */
-    overflow-y: auto;  /* Ativa a barra de rolagem vertical */
-    padding-right: 5px;  /* Espaço para a barra de rolagem */
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 /* Estilização da barra de rolagem */
@@ -293,6 +293,30 @@ header{
     background:#8b4728;
 }
 
+/* Botão Mostrar Mais */
+.container-mostrar-mais {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#btn-mostrar-mais {
+    background: #fff;
+    color: #a35732;
+    border: 2px solid #a35732;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+#btn-mostrar-mais:hover {
+    background: #a35732;
+    color: #fff;
+}
+
 footer{
     text-align:center;
     padding:30px;
@@ -376,150 +400,3 @@ footer{
             <h2>🏠 Soluções práticas para sua casa</h2>
             <p>
                 Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
-            </p>
-        </section>
-
-        <div class="busca-container">
-            <input
-                type="text"
-                id="pesquisa"
-                placeholder="🔎 Pesquise um produto..."
-                onkeyup="aplicarFiltros()"
-            >
-        </div>
-
-        <div id="contador" class="contador"></div>
-
-        <div id="produtos" class="produtos"></div>
-    </main>
-</div>
-
-<footer>
-    Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
-</footer>
-
-<script>
-let categoriaSelecionada = "todos";
-
-function aplicarFiltros() {
-    const filtro = document.getElementById("pesquisa").value.toLowerCase();
-    const criterioOrdenacao = document.getElementById("ordenacao").value;
-    const containerProdutos = document.getElementById("produtos");
-    
-    // Pega todos os cards de produtos atuais na tela
-    const cards = Array.from(containerProdutos.querySelectorAll(".card"));
-    
-    let visiveis = 0;
-
-    // 1. Filtragem (Pesquisa e Categoria)
-    cards.forEach(produto => {
-        const texto = produto.innerText.toLowerCase();
-        const atendePesquisa = texto.includes(filtro);
-        const atendeCategoria =
-            categoriaSelecionada === "todos" ||
-            produto.dataset.categoria === categoriaSelecionada;
-
-        if(atendePesquisa && atendeCategoria){
-            produto.style.display = "";
-            visiveis++;
-        }else{
-            produto.style.display = "none";
-        }
-    });
-
-    // 2. Ordenação dos elementos no DOM
-    cards.sort((a, b) => {
-        if (criterioOrdenacao === "az") {
-            const nomeA = a.querySelector("h3").innerText.toLowerCase();
-            const nomeB = b.querySelector("h3").innerText.toLowerCase();
-            return nomeA.localeCompare(nomeB);
-        } 
-        else if (criterioOrdenacao === "menor-maior") {
-            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-            return precoA - precoB; // Do menor para o maior
-        }
-        else if (criterioOrdenacao === "maior-menor") {
-            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-            return precoB - precoA; // Do maior para o menor
-        }
-        return 0; // Ordem padrão original do CSV
-    });
-
-    // Reorganiza os elementos visualmente na tela de acordo com a ordenação
-    cards.forEach(card => containerProdutos.appendChild(card));
-
-    // 3. Atualiza o contador de visíveis
-    const contador = document.getElementById("contador");
-    if(contador){
-        contador.innerText = `${visiveis} produto(s) encontrado(s)`;
-    }
-}
-
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
-
-fetch(CSV_URL)
-.then(resp => resp.text())
-.then(data => {
-    const linhas = data.trim().split("\n").slice(1);
-
-    linhas.forEach(linha => {
-        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
-        if(!colunas || colunas.length < 5) return;
-
-        const nome = colunas[0].replaceAll('"','').trim();
-        const imagem = colunas[1].replaceAll('"','').trim();
-        const preco = colunas[2].replaceAll('"','').trim();
-        const link = colunas[3].replaceAll('"','').trim();
-        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
-
-        document.getElementById("produtos").innerHTML += `
-            <div class="card produto" data-categoria="${categoria}">
-                <img src="${imagem}" alt="${nome}">
-                <div class="info">
-                    <div class="selo">
-                        Oferta Especial
-                    </div>
-                    <h3>${nome}</h3>
-                    <div class="preco">
-                        ${preco}
-                    </div>
-                    <div class="parcela">
-                        Confira disponibilidade e condições atualizadas
-                    </div>
-                    <a href="${link}" target="_blank" class="botao">
-                        🛒 Ver Oferta
-                    </a>
-                </div>
-            </div>
-        `;
-    });
-
-    aplicarFiltros();
-})
-.catch(error => {
-    document.getElementById("produtos").innerHTML = `
-        <p style="text-align:center;color:red;">
-            Não foi possível carregar os produtos.
-        </p>
-    `;
-    console.error(error);
-});
-
-document.addEventListener("click", function(e){
-    if(!e.target.classList.contains("filtro")) return;
-
-    document.querySelectorAll(".filtro")
-        .forEach(btn => btn.classList.remove("ativo"));
-
-    e.target.classList.add("ativo");
-
-    categoriaSelecionada = e.target.dataset.categoria;
-
-    aplicarFiltros();
-});
-</script>
-
-</body>
-</html>
