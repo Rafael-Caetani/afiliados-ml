@@ -1,4 +1,4 @@
-a[
+[
   {
     "nome": "Prateleira Organizadora",
     "categoria": "Organização",
@@ -12,16 +12,12 @@ a[
     "preco": 59.90,
     "imagem": "https://...",
     "link": "https://..."
-  }
-][
-  {
-    "nome": "Prateleira Organizadora",
-    "categoria": "Organização",
-    "preco": 89.90
   },
   {
     "nome": "Escorredor de Louça",
     "categoria": "Cozinha",
-    "preco": 59.90
+    "preco": 59.90,
+    "imagem": "https://...",
+    "link": "https://..."
   }
 ]
