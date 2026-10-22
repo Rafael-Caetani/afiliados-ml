@@ -13,7 +13,24 @@
     padding:0;
     box-sizing:border-box;
 }
+.busca-container{
+    max-width:700px;
+    margin:20px auto;
+    padding:0 20px;
+}
 
+#pesquisa{
+    width:100%;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:16px;
+    outline:none;
+}
+
+#pesquisa:focus{
+    border-color:#a35732;
+}
 body{
     background:#f3f4f6;
     font-family:Arial, Helvetica, sans-serif;
@@ -211,7 +228,14 @@ footer{
         Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
     </p>
 </section>
-
+<div class="busca-container">
+    <input
+        type="text"
+        id="pesquisa"
+        placeholder="🔎 Pesquise um produto..."
+        onkeyup="filtrarProdutos()"
+    >
+</div>
 <div class="container">
 
     <div class="filtros">
@@ -244,8 +268,31 @@ footer{
     Alguns links podem gerar comissão de afiliado sem custo adicional para você.
 </footer>
 
-<script>
 
+<script>
+function filtrarProdutos() {
+
+    const filtro = document
+        .getElementById("pesquisa")
+        .value
+        .toLowerCase();
+
+    const produtos =
+        document.querySelectorAll(".produto");
+
+    produtos.forEach(produto => {
+
+        const texto = produto.innerText.toLowerCase();
+
+        if(texto.includes(filtro)){
+            produto.style.display = "";
+        } else {
+            produto.style.display = "none";
+        }
+
+    });
+
+}
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
 
 fetch(CSV_URL)
@@ -267,7 +314,7 @@ fetch(CSV_URL)
         const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
 
         document.getElementById("produtos").innerHTML += `
-        <div class="card" data-categoria="${categoria}">
+      <div class="card produto" data-categoria="${categoria}">
 
             <img src="${imagem}" alt="${nome}">
 
