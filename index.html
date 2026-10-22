@@ -83,6 +83,31 @@ header{
     border-bottom: 2px solid #f3f4f6;
 }
 
+.sidebar-section {
+    margin-bottom: 25px;
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Select de Ordenação */
+.select-ordenacao {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    color: #6b5b4f;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+}
+
+.select-ordenacao:focus {
+    border-color: #a35732;
+}
+
 .filtros{
     display: flex;
     flex-direction: column;
@@ -277,25 +302,38 @@ footer{
 <div class="layout-principal">
     <!-- Menu Lateral Esquerdo -->
     <aside class="sidebar">
-        <h3>Categorias</h3>
-        <div class="filtros">
-            <button class="filtro ativo" data-categoria="todos">Todos</button>
-            <button class="filtro" data-categoria="automotivo">Automotivo</button>
-            <button class="filtro" data-categoria="beleza">Beleza</button>
-            <button class="filtro" data-categoria="casa">Casa</button>
-            <button class="filtro" data-categoria="cozinha">Cozinha</button>
-            <button class="filtro" data-categoria="decoracao">Decoração</button>
-            <button class="filtro" data-categoria="eletrodomesticos">Eletrodomésticos</button>
-            <button class="filtro" data-categoria="ferramentas">Ferramentas</button>
-            <button class="filtro" data-categoria="fitness">Fitness</button>
-            <button class="filtro" data-categoria="iluminacao">Iluminação</button>
-            <button class="filtro" data-categoria="lazer">Lazer</button>
-            <button class="filtro" data-categoria="livros">Livros</button>
-            <button class="filtro" data-categoria="moda">Moda</button>
-            <button class="filtro" data-categoria="moveis">Móveis</button>
-            <button class="filtro" data-categoria="pets">Pets</button>
-            <button class="filtro" data-categoria="saude">Saúde</button>
-            <button class="filtro" data-categoria="tecnologia">Tecnologia</button>
+        <!-- Seção de Ordenação -->
+        <div class="sidebar-section">
+            <h3>Ordenar por</h3>
+            <select id="ordenacao" class="select-ordenacao" onchange="aplicarFiltros()">
+                <option value="padrao">Padrão</option>
+                <option value="az">A - Z</option>
+                <option value="maior-menor">Valor: Maior para Menor</option>
+            </select>
+        </div>
+
+        <!-- Seção de Categorias -->
+        <div class="sidebar-section">
+            <h3>Categorias</h3>
+            <div class="filtros">
+                <button class="filtro ativo" data-categoria="todos">Todos</button>
+                <button class="filtro" data-categoria="automotivo">Automotivo</button>
+                <button class="filtro" data-categoria="beleza">Beleza</button>
+                <button class="filtro" data-categoria="casa">Casa</button>
+                <button class="filtro" data-categoria="cozinha">Cozinha</button>
+                <button class="filtro" data-categoria="decoracao">Decoração</button>
+                <button class="filtro" data-categoria="eletrodomesticos">Eletrodomésticos</button>
+                <button class="filtro" data-categoria="ferramentas">Ferramentas</button>
+                <button class="filtro" data-categoria="fitness">Fitness</button>
+                <button class="filtro" data-categoria="iluminacao">Iluminação</button>
+                <button class="filtro" data-categoria="lazer">Lazer</button>
+                <button class="filtro" data-categoria="livros">Livros</button>
+                <button class="filtro" data-categoria="moda">Moda</button>
+                <button class="filtro" data-categoria="moveis">Móveis</button>
+                <button class="filtro" data-categoria="pets">Pets</button>
+                <button class="filtro" data-categoria="saude">Saúde</button>
+                <button class="filtro" data-categoria="tecnologia">Tecnologia</button>
+            </div>
         </div>
     </aside>
 
@@ -331,29 +369,51 @@ footer{
 let categoriaSelecionada = "todos";
 
 function aplicarFiltros() {
-    const filtro = document
-        .getElementById("pesquisa")
-        .value
-        .toLowerCase();
-
+    const filtro = document.getElementById("pesquisa").value.toLowerCase();
+    const criterioOrdenacao = document.getElementById("ordenacao").value;
+    const containerProdutos = document.getElementById("produtos");
+    
+    // Pega todos os cards de produtos atuais na tela
+    const cards = Array.from(containerProdutos.querySelectorAll(".card"));
+    
     let visiveis = 0;
 
-    document.querySelectorAll(".produto")
-        .forEach(produto => {
-            const texto = produto.innerText.toLowerCase();
-            const atendePesquisa = texto.includes(filtro);
-            const atendeCategoria =
-                categoriaSelecionada === "todos" ||
-                produto.dataset.categoria === categoriaSelecionada;
+    // 1. Filtragem (Pesquisa e Categoria)
+    cards.forEach(produto => {
+        const texto = produto.innerText.toLowerCase();
+        const atendePesquisa = texto.includes(filtro);
+        const atendeCategoria =
+            categoriaSelecionada === "todos" ||
+            produto.dataset.categoria === categoriaSelecionada;
 
-            if(atendePesquisa && atendeCategoria){
-                produto.style.display = "";
-                visiveis++;
-            }else{
-                produto.style.display = "none";
-            }
-        });
+        if(atendePesquisa && atendeCategoria){
+            produto.style.display = "";
+            visiveis++;
+        }else{
+            produto.style.display = "none";
+        }
+    });
 
+    // 2. Ordenação dos elementos no DOM
+    cards.sort((a, b) => {
+        if (criterioOrdenacao === "az") {
+            const nomeA = a.querySelector("h3").innerText.toLowerCase();
+            const nomeB = b.querySelector("h3").innerText.toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        } 
+        else if (criterioOrdenacao === "maior-menor") {
+            // Converte o texto do preço (ex: "R$ 150,00") para número puro (150.00)
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoB - precoA; // Do maior para o menor
+        }
+        return 0; // Ordem padrão original do CSV
+    });
+
+    // Reorganiza os elementos visualmente na tela de acordo com a ordenação
+    cards.forEach(card => containerProdutos.appendChild(card));
+
+    // 3. Atualiza o contador de visíveis
     const contador = document.getElementById("contador");
     if(contador){
         contador.innerText = `${visiveis} produto(s) encontrado(s)`;
