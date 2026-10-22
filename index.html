@@ -7,7 +7,13 @@
 <title>Lar Prático | Ofertas Selecionadas</title>
 
 <style>
-
+.contador{
+    text-align:center;
+    color:#666;
+    margin-bottom:20px;
+    font-size:14px;
+    font-weight:600;
+}
 *{
     margin:0;
     padding:0;
@@ -233,9 +239,10 @@ footer{
         type="text"
         id="pesquisa"
         placeholder="🔎 Pesquise um produto..."
-        onkeyup="filtrarProdutos()"
+       onkeyup="aplicarFiltros()"
     >
 </div>
+    <div id="contador" class="contador"></div>
 <div class="container">
 
     <div class="filtros">
@@ -265,34 +272,54 @@ footer{
 </div>
 
 <footer>
-    Alguns links podem gerar comissão de afiliado sem custo adicional para você.
+    Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
 </footer>
 
 
 <script>
-function filtrarProdutos() {
+
+let categoriaSelecionada = "todos";
+
+function aplicarFiltros() {
 
     const filtro = document
         .getElementById("pesquisa")
         .value
         .toLowerCase();
 
-    const produtos =
-        document.querySelectorAll(".produto");
+    let visiveis = 0;
 
-    produtos.forEach(produto => {
+    document.querySelectorAll(".produto")
+        .forEach(produto => {
 
-        const texto = produto.innerText.toLowerCase();
+        const texto =
+            produto.innerText.toLowerCase();
 
-        if(texto.includes(filtro)){
+        const atendePesquisa =
+            texto.includes(filtro);
+
+        const atendeCategoria =
+            categoriaSelecionada === "todos" ||
+            produto.dataset.categoria === categoriaSelecionada;
+
+        if(atendePesquisa && atendeCategoria){
             produto.style.display = "";
-        } else {
+            visiveis++;
+        }else{
             produto.style.display = "none";
         }
 
     });
 
+    const contador =
+        document.getElementById("contador");
+
+    if(contador){
+        contador.innerText =
+            `${visiveis} produto(s) encontrado(s)`;
+    }
 }
+
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
 
 fetch(CSV_URL)
@@ -303,46 +330,62 @@ fetch(CSV_URL)
 
     linhas.forEach(linha => {
 
-        const colunas = linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+        const colunas =
+            linha.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 
         if(!colunas || colunas.length < 5) return;
 
-        const nome = colunas[0].replaceAll('"','').trim();
-        const imagem = colunas[1].replaceAll('"','').trim();
-        const preco = colunas[2].replaceAll('"','').trim();
-        const link = colunas[3].replaceAll('"','').trim();
-        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
+        const nome =
+            colunas[0].replaceAll('"','').trim();
+
+        const imagem =
+            colunas[1].replaceAll('"','').trim();
+
+        const preco =
+            colunas[2].replaceAll('"','').trim();
+
+        const link =
+            colunas[3].replaceAll('"','').trim();
+
+        const categoria =
+            colunas[4]
+            .replaceAll('"','')
+            .trim()
+            .toLowerCase();
 
         document.getElementById("produtos").innerHTML += `
-      <div class="card produto" data-categoria="${categoria}">
+            <div class="card produto" data-categoria="${categoria}">
 
-            <img src="${imagem}" alt="${nome}">
+                <img src="${imagem}" alt="${nome}">
 
-            <div class="info">
+                <div class="info">
 
-                <div class="selo">
-                    Oferta Especial
+                    <div class="selo">
+                        Oferta Especial
+                    </div>
+
+                    <h3>${nome}</h3>
+
+                    <div class="preco">
+                        ${preco}
+                    </div>
+
+                    <div class="parcela">
+                        Confira disponibilidade e condições atualizadas
+                    </div>
+
+                    <a href="${link}" target="_blank" class="botao">
+                        🛒 Ver Oferta
+                    </a>
+
                 </div>
-
-                <h3>${nome}</h3>
-
-                <div class="preco">
-                    ${preco}
-                </div>
-
-                <div class="parcela">
-                    Confira disponibilidade e condições atualizadas
-                </div>
-
-                <a href="${link}" target="_blank" class="botao">
-                    🛒 Ver Oferta
-                </a>
 
             </div>
-
-        </div>
         `;
+
     });
+
+    aplicarFiltros();
 
 })
 .catch(error => {
@@ -361,30 +404,20 @@ document.addEventListener("click", function(e){
 
     if(!e.target.classList.contains("filtro")) return;
 
-    document.querySelectorAll(".filtro").forEach(btn => {
-        btn.classList.remove("ativo");
-    });
+    document.querySelectorAll(".filtro")
+        .forEach(btn => btn.classList.remove("ativo"));
 
     e.target.classList.add("ativo");
 
-    const categoria = e.target.dataset.categoria;
+    categoriaSelecionada =
+        e.target.dataset.categoria;
 
-    document.querySelectorAll(".card").forEach(card => {
-
-        if(
-            categoria === "todos" ||
-            card.dataset.categoria === categoria
-        ){
-            card.style.display = "";
-        }else{
-            card.style.display = "none";
-        }
-
-    });
+    aplicarFiltros();
 
 });
 
 </script>
+
 
 </body>
 </html>
