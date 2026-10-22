@@ -1,49 +1,55 @@
-name: Verificar Produtos
+import json
+import requests
+import csv
+from datetime import datetime
 
-on:
-  workflow_dispatch:
+# headers pra não ser bloqueado pela Amazon
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0"}
 
-permissions:
-  contents: write
+with open("produtos.json", "r", encoding="utf-8") as f:
+    produtos = json.load(f)
 
-jobs:
-  verificar:
-    runs-on: ubuntu-latest
+relatorio = ["# Relatório de Integridade", f"_Gerado em {datetime.now():%d/%m/%Y %H:%M}_\n"]
+historico_rows = []
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+for p in produtos:
+    nome = p.get("nome")
+    link = p.get("link")
+    img = p.get("imagem")
+    
+    # 1. Checa link do produto
+    try:
+        r = requests.head(link, headers=HEADERS, timeout=10, allow_redirects=True)
+        if r.status_code != 200:
+            relatorio.append(f"- ❌ **{nome}** - Link quebrado ({r.status_code}) -> {link}")
+    except Exception as e:
+        relatorio.append(f"- ❌ **{nome}** - Erro ao acessar link: {e}")
 
-      - name: Configurar Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
+    # 2. Checa imagem
+    try:
+        r_img = requests.head(img, headers=HEADERS, timeout=10)
+        if r_img.status_code != 200:
+            relatorio.append(f"- ⚠️ **{nome}** - Imagem quebrada -> {img}")
+    except:
+        relatorio.append(f"- ⚠️ **{nome}** - Imagem com erro")
 
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    # 3. Guarda histórico (aqui você depois adiciona o scraping de preço)
+    historico_rows.append({
+        "data": datetime.now().isoformat(),
+        "nome": nome,
+        "preco_planilha": p.get("preco"),
+        "link": link
+    })
 
-      - name: Executar verificador
-        run: |
-          python verificador.py
+if len(relatorio) == 2:
+    relatorio.append("✅ Nenhum link quebrado encontrado. Tudo OK!")
 
-      - name: Commit arquivos
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+with open("relatorio_integridade.md", "w", encoding="utf-8") as f:
+    f.write("\n".join(relatorio))
 
-          # Garante que os arquivos existem antes de adicionar
-          touch relatorio_integridade.md historico_precos.csv
-          git add relatorio_integridade.md historico_precos.csv
+with open("historico_precos.csv", "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=["data","nome","preco_planilha","link"])
+    w.writeheader()
+    w.writerows(historico_rows)
 
-          if git diff --staged --quiet; then
-            echo "Sem alteracoes"
-            exit 0
-          fi
-
-          git commit -m "Atualizacao automatica"
-          git pull --rebase origin main
-          git push
+print("Verificação finalizada")
