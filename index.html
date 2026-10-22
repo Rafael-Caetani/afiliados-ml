@@ -62,7 +62,7 @@ header{
     gap: 30px;
 }
 
-/* Menu Lateral (Sidebar) */
+/* Menu Lateral (Sidebar) Esquerdo */
 .sidebar {
     width: 260px;
     flex-shrink: 0;
@@ -73,6 +73,9 @@ header{
     height: fit-content;
     position: sticky;
     top: 20px;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar h3 {
@@ -89,6 +92,10 @@ header{
 
 .sidebar-section:last-child {
     margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 /* Select de Ordenação */
@@ -108,10 +115,30 @@ header{
     border-color: #a35732;
 }
 
+/* Container de Categorias com Rolagem Independente */
 .filtros{
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: 320px; /* Altura limite para ativar a barra de rolagem */
+    overflow-y: auto;  /* Ativa a barra de rolagem vertical */
+    padding-right: 5px;  /* Espaço para a barra de rolagem */
+}
+
+/* Estilização da barra de rolagem */
+.filtros::-webkit-scrollbar {
+    width: 6px;
+}
+.filtros::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.filtros::-webkit-scrollbar-thumb {
+    background: #d4b2a3;
+    border-radius: 4px;
+}
+.filtros::-webkit-scrollbar-thumb:hover {
+    background: #a35732;
 }
 
 .filtro{
@@ -125,6 +152,7 @@ header{
     text-align: left;
     transition: .2s;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .filtro:hover{
@@ -282,6 +310,10 @@ footer{
         width: 100%;
         position: relative;
         top: 0;
+        max-height: none;
+    }
+    .filtros {
+        max-height: 250px;
     }
 }
 </style>
@@ -313,7 +345,7 @@ footer{
             </select>
         </div>
 
-        <!-- Seção de Categorias -->
+        <!-- Seção de Categorias com Rolagem Independente -->
         <div class="sidebar-section">
             <h3>Categorias</h3>
             <div class="filtros">
