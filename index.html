@@ -6,6 +6,32 @@
 
 <title>Lar Prático | Ofertas Selecionadas</title>
 
+<!-- Importando os SDKs do Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY_DO_FIREBASE", // Substitua se necessário, ou configure as credenciais da web do projeto
+        authDomain: "larpratico-ee811.firebaseapp.com",
+        projectId: "larpratico-ee811",
+        storageBucket: "larpratico-ee811.appspot.com",
+        messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+        appId: "SEU_APP_ID"
+    };
+
+    // Inicializando Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.dbFns = { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove };
+    window.authFns = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+</script>
+
 <style>
 *{
     margin:0;
@@ -115,6 +141,7 @@ header {
     font-size: 12px;
     font-weight: 600;
     transition: 0.2s;
+    cursor: pointer;
 }
 
 .acao-item:hover {
@@ -126,7 +153,7 @@ header {
     margin-bottom: 2px;
 }
 
-/* Modal / Janela Quem Somos */
+/* Modais (Quem Somos e Conta) */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -143,7 +170,7 @@ header {
 
 .modal-content {
     background: #fff;
-    max-width: 600px;
+    max-width: 450px;
     width: 100%;
     padding: 35px;
     border-radius: 15px;
@@ -159,7 +186,7 @@ header {
 
 .modal-content h2 {
     color: #a35732;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-size: 22px;
     border-bottom: 2px solid #f3f4f6;
     padding-bottom: 10px;
@@ -186,6 +213,63 @@ header {
 
 .modal-fechar:hover {
     color: #a35732;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    color: #6b5b4f;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #a35732;
+}
+
+.btn-auth {
+    width: 100%;
+    background: #a35732;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+.btn-auth:hover {
+    background: #8b4728;
+}
+
+.auth-toggle {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.auth-toggle a {
+    color: #a35732;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 /* Layout Principal com Sidebar */
@@ -436,7 +520,7 @@ header {
     background:#8b4728;
 }
 
-/* Botão de Compartilhar no WhatsApp */
+/* Botão de WhatsApp */
 .botao-whatsapp {
     display: flex;
     align-items: center;
@@ -444,19 +528,31 @@ header {
     background: #25d366;
     color: white;
     text-decoration: none;
-    width: 46px;
+    width: 42px;
     border-radius: 10px;
     transition: 0.2s;
 }
+.botao-whatsapp:hover { background: #1ebe57; }
+.botao-whatsapp svg { width: 18px; height: 18px; fill: currentColor; }
 
-.botao-whatsapp:hover {
-    background: #1ebe57;
+/* Botão Favorito (Coração) */
+.botao-favorito {
+    background: #fff;
+    border: 2px solid #ddd;
+    color: #ccc;
+    width: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
 }
-
-.botao-whatsapp svg {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
+.botao-favorito.favoritado {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: #fdf2f2;
 }
 
 /* Botão Mostrar Mais */
@@ -477,11 +573,7 @@ header {
     transition: 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
-
-#btn-mostrar-mais:hover {
-    background: #a35732;
-    color: #fff;
-}
+#btn-mostrar-mais:hover { background: #a35732; color: #fff; }
 
 footer{
     text-align:center;
@@ -490,45 +582,23 @@ footer{
     font-size:14px;
 }
 
-/* Responsividade para telas menores (celulares) */
 @media (max-width: 768px) {
-    .layout-principal {
-        flex-direction: column;
-        padding: 15px;
-    }
-    .sidebar {
-        width: 100%;
-        position: relative;
-        top: 0;
-        max-height: none;
-    }
-    .filtros {
-        max-height: 250px;
-    }
-    .header-container {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    .header-esquerda {
-        flex-direction: column;
-    }
-    .header-nav {
-        justify-content: center;
-    }
-    .header-acoes {
-        justify-content: center;
-    }
+    .layout-principal { flex-direction: column; padding: 15px; }
+    .sidebar { width: 100%; position: relative; top: 0; max-height: none; }
+    .filtros { max-height: 250px; }
+    .header-container { flex-direction: column; align-items: center; text-align: center; }
+    .header-esquerda { flex-direction: column; }
+    .header-nav { justify-content: center; }
+    .header-acoes { justify-content: center; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- Cabeçalho Profissional Integrado -->
+<!-- Cabeçalho Profissional -->
 <header>
     <div class="header-container">
-        <!-- Esquerda: Logotipo e Título -->
         <div class="header-esquerda">
             <div class="logo-container">
                 <img src="Logo.png" alt="Lar Prático" class="logo">
@@ -539,19 +609,17 @@ footer{
             </div>
         </div>
 
-        <!-- Centro: Menu de Navegação Rápida -->
         <ul class="header-nav">
             <li><a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="ativo">Início</a></li>
             <li><a onclick="abrirQuemSomos()">Quem Somos</a></li>
         </ul>
 
-        <!-- Direita: Atalhos de Conta e Favoritos -->
         <div class="header-acoes">
-            <a href="#" class="acao-item">
+            <a onclick="abrirModalConta()" class="acao-item">
                 <span>👤</span>
-                Minha Conta
+                <span id="label-conta">Minha Conta</span>
             </a>
-            <a href="#" class="acao-item">
+            <a onclick="filtrarFavoritos()" class="acao-item">
                 <span>❤️</span>
                 Favoritos
             </a>
@@ -559,22 +627,45 @@ footer{
     </div>
 </header>
 
-<!-- Janela Modal "Quem Somos" -->
+<!-- Modal Quem Somos -->
 <div id="modalQuemSomos" class="modal-overlay">
     <div class="modal-content">
         <button class="modal-fechar" onclick="fecharQuemSomos()">&times;</button>
         <h2>🏠 Quem Somos - Lar Prático</h2>
         <p>Bem-vindo ao <strong>Lar Prático</strong>! Nossa missão é simplificar a sua rotina e transformar a sua casa em um ambiente mais funcional, confortável e aconchegante.</p>
-        <p>Buscamos e selecionamos cuidadosamente utilidades domésticas, ferramentas, eletrônicos e soluções de excelente custo-benefício para que você encontre exatamente o que precisa, sem perder tempo comparando centenas de opções na internet.</p>
-        <p>Trabalhamos com links recomendados das melhores plataformas do mercado. Ao adquirir um produto pelos nossos links, você apoia o nosso trabalho de curadoria sem pagar absolutamente nada a mais por isso.</p>
-        <p>Obrigado por confiar no <strong>Lar Prático</strong> para fazer parte do seu dia a dia!</p>
+        <p>Buscamos utilidades domésticas e soluções de excelente custo-benefício para que você encontre exatamente o que precisa.</p>
+    </div>
+</div>
+
+<!-- Modal de Conta (Login / Cadastro) -->
+<div id="modalConta" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-fechar" onclick="fecharModalConta()">&times;</button>
+        <div id="auth-form-container">
+            <h2 id="auth-titulo">Entrar na sua Conta</h2>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="auth-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="auth-password" placeholder="Sua senha">
+            </div>
+            <button class="btn-auth" onclick="realizarAutenticacao()" id="btn-submit-auth">Entrar</button>
+            <div class="auth-toggle">
+                <span id="auth-toggle-text">Não tem uma conta?</span> <a onclick="alternarModoAuth()">Cadastre-se</a>
+            </div>
+        </div>
+        <div id="auth-user-container" style="display: none;">
+            <h2>Minha Conta</h2>
+            <p>Logado como: <strong id="user-email-display"></strong></p>
+            <button class="btn-auth" onclick="fazerLogout()" style="background: #e74c3c;">Sair da Conta</button>
+        </div>
     </div>
 </div>
 
 <div class="layout-principal">
-    <!-- Menu Lateral Esquerdo com rolagem independente -->
     <aside class="sidebar">
-        <!-- Seção de Ordenação -->
         <div class="sidebar-section">
             <h3>Ordenar por</h3>
             <select id="ordenacao" class="select-ordenacao" onchange="aplicarFiltros()">
@@ -585,7 +676,6 @@ footer{
             </select>
         </div>
 
-        <!-- Seção de Categorias -->
         <div class="sidebar-section">
             <h3>Categorias</h3>
             <div class="filtros">
@@ -610,29 +700,19 @@ footer{
         </div>
     </aside>
 
-    <!-- Conteúdo Principal -->
     <main class="conteudo-principal">
         <section class="banner">
             <h2>🏠 Soluções práticas para sua casa</h2>
-            <p>
-                Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.
-            </p>
+            <p>Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.</p>
         </section>
 
         <div class="busca-container">
-            <input
-                type="text"
-                id="pesquisa"
-                placeholder="🔎 Pesquise um produto..."
-                onkeyup="aplicarFiltros()"
-            >
+            <input type="text" id="pesquisa" placeholder="🔎 Pesquise um produto..." onkeyup="aplicarFiltros()">
         </div>
 
         <div id="contador" class="contador"></div>
-
         <div id="produtos" class="produtos"></div>
 
-        <!-- Botão Mostrar Mais -->
         <div id="container-mostrar-mais" class="container-mostrar-mais" style="display: none;">
             <button id="btn-mostrar-mais" onclick="carregarMais()">Mostrar Mais</button>
         </div>
@@ -647,21 +727,130 @@ footer{
 let categoriaSelecionada = "todos";
 let limiteItens = 12; 
 const incrementoLote = 12; 
+let usuarioAtual = null;
+let meusFavoritos = [];
+let modoFavoritosAtivo = false;
+let isCadastro = false;
 
-// Funções para controlar a Janela "Quem Somos"
-function abrirQuemSomos() {
-    document.getElementById("modalQuemSomos").style.display = "flex";
+// Monitorar estado de autenticação do Firebase
+setTimeout(() => {
+    if (window.authFns && window.firebaseAuth) {
+        window.authFns.onAuthStateChanged(window.firebaseAuth, async (user) => {
+            usuarioAtual = user;
+            const labelConta = document.getElementById("label-conta");
+            if (user) {
+                labelConta.innerText = user.email.split('@')[0];
+                document.getElementById("auth-form-container").style.display = "none";
+                document.getElementById("auth-user-container").style.display = "block";
+                document.getElementById("user-email-display").innerText = user.email;
+                await carregarFavoritosNuvem();
+            } else {
+                labelConta.innerText = "Minha Conta";
+                document.getElementById("auth-form-container").style.display = "block";
+                document.getElementById("auth-user-container").style.display = "none";
+                meusFavoritos = [];
+                aplicarFiltros();
+            }
+        });
+    }
+}, 1000);
+
+async function carregarFavoritosNuvem() {
+    if (!usuarioAtual) return;
+    try {
+        const docRef = window.dbFns.doc(window.firebaseDb, "favoritos", usuarioAtual.uid);
+        const docSnap = await window.dbFns.getDoc(docRef);
+        if (docSnap.exists()) {
+            meusFavoritos = docSnap.data().itens || [];
+        } else {
+            meusFavoritos = [];
+        }
+        aplicarFiltros();
+    } catch (e) {
+        console.error("Erro ao carregar favoritos:", e);
+    }
 }
 
-function fecharQuemSomos() {
-    document.getElementById("modalQuemSomos").style.display = "none";
+async function alternarFavorito(nomeProduto, btnElement) {
+    if (!usuarioAtual) {
+        alert("Faça login na sua conta para salvar produtos nos favoritos!");
+        abrirModalConta();
+        return;
+    }
+
+    const docRef = window.dbFns.doc(window.firebaseDb, "favoritos", usuarioAtual.uid);
+    try {
+        if (meusFavoritos.includes(nomeProduto)) {
+            meusFavoritos = meusFavoritos.filter(item => item !== nomeProduto);
+            await window.dbFns.setDoc(docRef, { itens: meusFavoritos }, { merge: true });
+            btnElement.classList.remove("favoritado");
+        } else {
+            meusFavoritos.push(nomeProduto);
+            await window.dbFns.setDoc(docRef, { itens: meusFavoritos }, { merge: true });
+            btnElement.classList.add("favoritado");
+        }
+        if (modoFavoritosAtivo) aplicarFiltros();
+    } catch (e) {
+        console.error("Erro ao atualizar favorito:", e);
+    }
 }
 
-// Fechar modal ao clicar fora da caixa
+function filtrarFavoritos() {
+    if (!usuarioAtual) {
+        alert("Faça login para ver seus favoritos!");
+        abrirModalConta();
+        return;
+    }
+    modoFavoritosAtivo = !modoFavoritosAtivo;
+    const btnFavHeader = document.querySelector(".header-acoes .acao-item:nth-child(2)");
+    if (modoFavoritosAtivo) {
+        btnFavHeader.style.color = "#e74c3c";
+        categoriaSelecionada = "todos";
+    } else {
+        btnFavHeader.style.color = "#6b5b4f";
+    }
+    aplicarFiltros();
+}
+
+function abrirQuemSomos() { document.getElementById("modalQuemSomos").style.display = "flex"; }
+function fecharQuemSomos() { document.getElementById("modalQuemSomos").style.display = "none"; }
+function abrirModalConta() { document.getElementById("modalConta").style.display = "flex"; }
+function fecharModalConta() { document.getElementById("modalConta").style.display = "none"; }
+
+function alternarModoAuth() {
+    isCadastro = !isCadastro;
+    document.getElementById("auth-titulo").innerText = isCadastro ? "Criar Nova Conta" : "Entrar na sua Conta";
+    document.getElementById("btn-submit-auth").innerText = isCadastro ? "Cadastrar" : "Entrar";
+    document.getElementById("auth-toggle-text").innerText = isCadastro ? "Já tem uma conta?" : "Não tem uma conta?";
+    document.querySelector(".auth-toggle a").innerText = isCadastro ? "Faça login" : "Cadastre-se";
+}
+
+async function realizarAutenticacao() {
+    const email = document.getElementById("auth-email").value;
+    const senha = document.getElementById("auth-password").value;
+    try {
+        if (isCadastro) {
+            await window.authFns.createUserWithEmailAndPassword(window.firebaseAuth, email, senha);
+            alert("Conta criada com sucesso!");
+        } else {
+            await window.authFns.signInWithEmailAndPassword(window.firebaseAuth, email, senha);
+        }
+        fecharModalConta();
+    } catch (e) {
+        alert("Erro na autenticação: " + e.message);
+    }
+}
+
+async function fazerLogout() {
+    await window.authFns.signOut(window.firebaseAuth);
+    fecharModalConta();
+    modoFavoritosAtivo = false;
+    aplicarFiltros();
+}
+
 window.onclick = function(event) {
-    const modal = document.getElementById("modalQuemSomos");
-    if (event.target === modal) {
-        modal.style.display = "none";
+    if (event.target.classList.contains("modal-overlay")) {
+        event.target.style.display = "none";
     }
 }
 
@@ -672,11 +861,10 @@ function aplicarFiltros() {
     const containerBtnMais = document.getElementById("container-mostrar-mais");
     
     const cards = Array.from(containerProdutos.querySelectorAll(".card"));
-    
     let visiveis = 0;
     let exibidosContador = 0;
     
-    const estaFiltrando = filtro !== "" || categoriaSelecionada !== "todos";
+    const estaFiltrando = filtro !== "" || categoriaSelecionada !== "todos" || modoFavoritosAtivo;
 
     cards.sort((a, b) => {
         if (criterioOrdenacao === "az") {
@@ -698,15 +886,14 @@ function aplicarFiltros() {
     });
 
     cards.forEach(produto => {
+        const nomeProd = produto.querySelector("h3").innerText;
         const texto = produto.innerText.toLowerCase();
         const atendePesquisa = texto.includes(filtro);
-        const atendeCategoria =
-            categoriaSelecionada === "todos" ||
-            produto.dataset.categoria === categoriaSelecionada;
+        const atendeCategoria = categoriaSelecionada === "todos" || produto.dataset.categoria === categoriaSelecionada;
+        const atendeFavorito = !modoFavoritosAtivo || meusFavoritos.includes(nomeProd);
 
-        if(atendePesquisa && atendeCategoria){
+        if(atendePesquisa && atendeCategoria && atendeFavorito){
             visiveis++;
-            
             if (!estaFiltrando) {
                 if (exibidosContador < limiteItens) {
                     produto.style.display = "";
@@ -733,7 +920,7 @@ function aplicarFiltros() {
     const contador = document.getElementById("contador");
     if(contador){
         const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteItens);
-        contador.innerText = `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
+        contador.innerText = modoFavoritosAtivo ? `Exibindo ${visiveis} produto(s) favorito(s)` : `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
     }
 }
 
@@ -760,25 +947,21 @@ fetch(CSV_URL)
         const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
 
         const textoMsg = encodeURIComponent(`🔥 Olha essa oferta imperdível no Lar Prático!\n\n*${nome}*\nPor apenas *${preco}*\n\nConfira aqui: ${link}`);
+        const isFav = meusFavoritos.includes(nome) ? "favoritado" : "";
 
         document.getElementById("produtos").innerHTML += `
             <div class="card produto" data-categoria="${categoria}">
                 <img src="${imagem}" alt="${nome}">
                 <div class="info">
-                    <div class="selo">
-                        Oferta Especial
-                    </div>
+                    <div class="selo">Oferta Especial</div>
                     <h3>${nome}</h3>
-                    <div class="preco">
-                        ${preco}
-                    </div>
-                    <div class="parcela">
-                        Confira disponibilidade e condições atualizadas
-                    </div>
+                    <div class="preco">${preco}</div>
+                    <div class="parcela">Confira disponibilidade e condições atualizadas</div>
                     <div class="botoes-acao">
-                        <a href="${link}" target="_blank" class="botao">
-                            🛒 Ver Oferta
-                        </a>
+                        <a href="${link}" target="_blank" class="botao">🛒 Ver Oferta</a>
+                        <button class="botao-favorito ${isFav}" onclick="alternarFavorito('${nome.replaceAll("'", "\\'")}', this)" title="Salvar nos Favoritos">
+                            ❤️
+                        </button>
                         <a href="https://api.whatsapp.com/send?text=${textoMsg}" target="_blank" class="botao-whatsapp" title="Compartilhar no WhatsApp">
                             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
                         </a>
@@ -792,24 +975,19 @@ fetch(CSV_URL)
 })
 .catch(error => {
     document.getElementById("produtos").innerHTML = `
-        <p style="text-align:center;color:red;">
-            Não foi possível carregar os produtos.
-        </p>
+        <p style="text-align:center;color:red;">Não foi possível carregar os produtos.</p>
     `;
     console.error(error);
 });
 
 document.addEventListener("click", function(e){
     if(!e.target.classList.contains("filtro")) return;
-
-    document.querySelectorAll(".filtro")
-        .forEach(btn => btn.classList.remove("ativo"));
-
+    document.querySelectorAll(".filtro").forEach(btn => btn.classList.remove("ativo"));
     e.target.classList.add("ativo");
-
     categoriaSelecionada = e.target.dataset.categoria;
+    modoFavoritosAtivo = false;
+    document.querySelector(".header-acoes .acao-item:nth-child(2)").style.color = "#6b5b4f";
     limiteItens = 12; 
-
     aplicarFiltros();
 });
 </script>
