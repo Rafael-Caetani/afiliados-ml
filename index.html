@@ -147,13 +147,14 @@ header {
 
 .modal-content {
     background: #fff;
-    max-width: 450px;
+    max-width: 500px;
     width: 100%;
-    padding: 35px;
+    padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative;
     animation: fadeIn 0.3s ease;
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -161,12 +162,24 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Banner do Quem Somos com Logo do Mercado Livre */
+.modal-banner {
+    background: linear-gradient(135deg, #fff159 0%, #ffe600 100%);
+    margin: -30px -30px 20px -30px;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 3px solid #e6d2be;
+}
+
+.modal-banner img {
+    max-height: 45px;
+    object-fit: contain;
+}
+
 .modal-content h2 {
     color: #a35732;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-size: 22px;
-    border-bottom: 2px solid #f3f4f6;
-    padding-bottom: 10px;
 }
 
 .modal-content p {
@@ -183,9 +196,10 @@ header {
     background: transparent;
     border: none;
     font-size: 24px;
-    color: #777;
+    color: #333;
     cursor: pointer;
     font-weight: bold;
+    z-index: 10;
 }
 
 .modal-fechar:hover {
@@ -604,13 +618,16 @@ footer{
     </div>
 </header>
 
-<!-- Modal Quem Somos -->
+<!-- Modal Quem Somos com Banner do Mercado Livre -->
 <div id="modalQuemSomos" class="modal-overlay">
     <div class="modal-content">
         <button class="modal-fechar" onclick="fecharQuemSomos()">&times;</button>
+        <div class="modal-banner">
+            <img src="ML.png" alt="Mercado Livre">
+        </div>
         <h2>🏠 Quem Somos - Lar Prático</h2>
         <p>Bem-vindo ao <strong>Lar Prático</strong>! Nossa missão é simplificar a sua rotina e transformar a sua casa em um ambiente mais funcional, confortável e aconchegante.</p>
-        <p>Buscamos utilidades domésticas e soluções de excelente custo-benefício para que você encontre exatamente o que precisa.</p>
+        <p>Selecionamos as melhores ofertas e produtos do mercado para que você encontre exatamente o que precisa com excelente custo-benefício.</p>
     </div>
 </div>
 
@@ -709,7 +726,6 @@ let meusFavoritos = [];
 let modoFavoritosAtivo = false;
 let isCadastro = false;
 
-// Monitorar estado de autenticação do Firebase (disponibilizado via firebase-config.js)
 setTimeout(() => {
     if (window.authFns && window.firebaseAuth) {
         window.authFns.onAuthStateChanged(window.firebaseAuth, async (user) => {
