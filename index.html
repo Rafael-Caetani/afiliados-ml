@@ -1,11 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lar Prático | Ofertas Selecionadas</title>
+
+<!-- Importando os SDKs do Firebase -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Dica: Para produção profissional, você pode isolar isso em um arquivo config.js que não vai para o git
     const firebaseConfig = {
-        apiKey: "SUA_API_KEY", // O GitHub bloqueia se detectar strings reais de API aqui
+        apiKey: "SUA_API_KEY_DO_FIREBASE", // Substitua se necessário, ou configure as credenciais da web do projeto
         authDomain: "larpratico-ee811.firebaseapp.com",
         projectId: "larpratico-ee811",
         storageBucket: "larpratico-ee811.appspot.com",
@@ -13,9 +21,976 @@
         appId: "SEU_APP_ID"
     };
 
+    // Inicializando Firebase
     const app = initializeApp(firebaseConfig);
-    window.firebaseAuth = getAuth(app);
-    window.firebaseDb = getFirestore(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
     window.dbFns = { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove };
     window.authFns = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
 </script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f3f4f6;
+    font-family:Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Cabeçalho Profissional Alinhado */
+header {
+    background: linear-gradient(135deg, #f4e7da 0%, #e6d2be 100%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: relative;
+    z-index: 10;
+    padding: 15px 30px;
+}
+
+.header-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-container {
+    background: #fff;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.logo{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.titulo-area h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #a35732;
+    letter-spacing: 0.5px;
+}
+
+.titulo-area p {
+    color: #6b5b4f;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+/* Navegação do Cabeçalho */
+.header-nav {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    align-items: center;
+}
+
+.header-nav a {
+    text-decoration: none;
+    color: #6b5b4f;
+    font-weight: 600;
+    font-size: 15px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.header-nav a:hover, .header-nav a.ativo {
+    color: #a35732;
+}
+
+/* Ações do Cabeçalho (Conta, Favoritos) */
+.header-acoes {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.acao-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #6b5b4f;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.acao-item:hover {
+    color: #a35732;
+}
+
+.acao-item span {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+/* Modais (Quem Somos e Conta) */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #fff;
+    max-width: 450px;
+    width: 100%;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h2 {
+    color: #a35732;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 10px;
+}
+
+.modal-content p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.modal-fechar {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #777;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-fechar:hover {
+    color: #a35732;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    color: #6b5b4f;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #a35732;
+}
+
+.btn-auth {
+    width: 100%;
+    background: #a35732;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+.btn-auth:hover {
+    background: #8b4728;
+}
+
+.auth-toggle {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.auth-toggle a {
+    color: #a35732;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Layout Principal com Sidebar */
+.layout-principal {
+    display: flex;
+    flex: 1;
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 25px;
+    gap: 30px;
+}
+
+/* Menu Lateral (Sidebar) Esquerdo */
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h3 {
+    color: #a35732;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.sidebar-section {
+    margin-bottom: 25px;
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Select de Ordenação */
+.select-ordenacao {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    color: #6b5b4f;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+}
+
+.select-ordenacao:focus {
+    border-color: #a35732;
+}
+
+/* Container de Categorias com Rolagem Independente */
+.filtros{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.filtros::-webkit-scrollbar {
+    width: 6px;
+}
+.filtros::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.filtros::-webkit-scrollbar-thumb {
+    background: #d4b2a3;
+    border-radius: 4px;
+}
+.filtros::-webkit-scrollbar-thumb:hover {
+    background: #a35732;
+}
+
+.filtro{
+    border: none;
+    background: transparent;
+    color: #6b5b4f;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: left;
+    transition: .2s;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.filtro:hover{
+    background: #F4E7DA;
+    color: #a35732;
+}
+
+.filtro.ativo{
+    background: #a35732;
+    color: #fff;
+}
+
+/* Conteúdo Principal */
+.conteudo-principal {
+    flex: 1;
+}
+
+.contador{
+    text-align: left;
+    color:#666;
+    margin-bottom:20px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.busca-container{
+    margin-bottom: 20px;
+}
+
+#pesquisa{
+    width:100%;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:16px;
+    outline:none;
+    background: #fff;
+}
+
+#pesquisa:focus{
+    border-color:#a35732;
+}
+
+.banner{
+    background:white;
+    padding:30px;
+    text-align:center;
+    border-radius:15px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+    margin-bottom: 30px;
+}
+
+.banner h2{
+    color:#a35732;
+    margin-bottom:12px;
+}
+
+.banner p{
+    color:#666;
+    line-height:1.5;
+}
+
+.produtos{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:24px;
+}
+
+.card{
+    background:#fff;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+    transition:.2s ease;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
+
+.card img{
+    width:100%;
+    height:250px;
+    object-fit:contain;
+    background:white;
+    padding:15px;
+}
+
+.info{
+    padding:18px;
+}
+
+.info h3{
+    font-size:16px;
+    line-height:1.4;
+    min-height:70px;
+    color:#333;
+}
+
+.preco{
+    font-size:28px;
+    color:#00a650;
+    font-weight:bold;
+    margin-top:12px;
+}
+
+.parcela{
+    font-size:13px;
+    color:#777;
+    margin-top:4px;
+}
+
+.selo{
+    background:#00a650;
+    color:white;
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+.botoes-acao {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.botao{
+    flex: 1;
+    display:block;
+    text-align:center;
+    background:#a35732;
+    color:white;
+    text-decoration:none;
+    padding:12px 10px;
+    border-radius:10px;
+    font-weight:bold;
+    font-size: 14px;
+    transition:0.2s;
+}
+
+.botao:hover{
+    background:#8b4728;
+}
+
+/* Botão de WhatsApp */
+.botao-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #25d366;
+    color: white;
+    text-decoration: none;
+    width: 42px;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+.botao-whatsapp:hover { background: #1ebe57; }
+.botao-whatsapp svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* Botão Favorito (Coração) */
+.botao-favorito {
+    background: #fff;
+    border: 2px solid #ddd;
+    color: #ccc;
+    width: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+}
+.botao-favorito.favoritado {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: #fdf2f2;
+}
+
+/* Botão Mostrar Mais */
+.container-mostrar-mais {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#btn-mostrar-mais {
+    background: #fff;
+    color: #a35732;
+    border: 2px solid #a35732;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+#btn-mostrar-mais:hover { background: #a35732; color: #fff; }
+
+footer{
+    text-align:center;
+    padding:30px;
+    color:#777;
+    font-size:14px;
+}
+
+@media (max-width: 768px) {
+    .layout-principal { flex-direction: column; padding: 15px; }
+    .sidebar { width: 100%; position: relative; top: 0; max-height: none; }
+    .filtros { max-height: 250px; }
+    .header-container { flex-direction: column; align-items: center; text-align: center; }
+    .header-esquerda { flex-direction: column; }
+    .header-nav { justify-content: center; }
+    .header-acoes { justify-content: center; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Cabeçalho Profissional -->
+<header>
+    <div class="header-container">
+        <div class="header-esquerda">
+            <div class="logo-container">
+                <img src="Logo.png" alt="Lar Prático" class="logo">
+            </div>
+            <div class="titulo-area">
+                <h1>Lar Prático</h1>
+                <p>Produtos selecionados para facilitar seu dia a dia</p>
+            </div>
+        </div>
+
+        <ul class="header-nav">
+            <li><a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="ativo">Início</a></li>
+            <li><a onclick="abrirQuemSomos()">Quem Somos</a></li>
+        </ul>
+
+        <div class="header-acoes">
+            <a onclick="abrirModalConta()" class="acao-item">
+                <span>👤</span>
+                <span id="label-conta">Minha Conta</span>
+            </a>
+            <a onclick="filtrarFavoritos()" class="acao-item">
+                <span>❤️</span>
+                Favoritos
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Modal Quem Somos -->
+<div id="modalQuemSomos" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-fechar" onclick="fecharQuemSomos()">&times;</button>
+        <h2>🏠 Quem Somos - Lar Prático</h2>
+        <p>Bem-vindo ao <strong>Lar Prático</strong>! Nossa missão é simplificar a sua rotina e transformar a sua casa em um ambiente mais funcional, confortável e aconchegante.</p>
+        <p>Buscamos utilidades domésticas e soluções de excelente custo-benefício para que você encontre exatamente o que precisa.</p>
+    </div>
+</div>
+
+<!-- Modal de Conta (Login / Cadastro) -->
+<div id="modalConta" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-fechar" onclick="fecharModalConta()">&times;</button>
+        <div id="auth-form-container">
+            <h2 id="auth-titulo">Entrar na sua Conta</h2>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="auth-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="auth-password" placeholder="Sua senha">
+            </div>
+            <button class="btn-auth" onclick="realizarAutenticacao()" id="btn-submit-auth">Entrar</button>
+            <div class="auth-toggle">
+                <span id="auth-toggle-text">Não tem uma conta?</span> <a onclick="alternarModoAuth()">Cadastre-se</a>
+            </div>
+        </div>
+        <div id="auth-user-container" style="display: none;">
+            <h2>Minha Conta</h2>
+            <p>Logado como: <strong id="user-email-display"></strong></p>
+            <button class="btn-auth" onclick="fazerLogout()" style="background: #e74c3c;">Sair da Conta</button>
+        </div>
+    </div>
+</div>
+
+<div class="layout-principal">
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <h3>Ordenar por</h3>
+            <select id="ordenacao" class="select-ordenacao" onchange="aplicarFiltros()">
+                <option value="padrao">Padrão</option>
+                <option value="az">A - Z</option>
+                <option value="menor-maior">Valor: Menor para Maior</option>
+                <option value="maior-menor">Valor: Maior para Menor</option>
+            </select>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Categorias</h3>
+            <div class="filtros">
+                <button class="filtro ativo" data-categoria="todos">Todos</button>
+                <button class="filtro" data-categoria="automotivo">Automotivo</button>
+                <button class="filtro" data-categoria="beleza">Beleza</button>
+                <button class="filtro" data-categoria="casa">Casa</button>
+                <button class="filtro" data-categoria="cozinha">Cozinha</button>
+                <button class="filtro" data-categoria="decoracao">Decoração</button>
+                <button class="filtro" data-categoria="eletrodomesticos">Eletrodomésticos</button>
+                <button class="filtro" data-categoria="ferramentas">Ferramentas</button>
+                <button class="filtro" data-categoria="fitness">Fitness</button>
+                <button class="filtro" data-categoria="iluminacao">Iluminação</button>
+                <button class="filtro" data-categoria="lazer">Lazer</button>
+                <button class="filtro" data-categoria="livros">Livros</button>
+                <button class="filtro" data-categoria="moda">Moda</button>
+                <button class="filtro" data-categoria="moveis">Móveis</button>
+                <button class="filtro" data-categoria="pets">Pets</button>
+                <button class="filtro" data-categoria="saude">Saúde</button>
+                <button class="filtro" data-categoria="tecnologia">Tecnologia</button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <section class="banner">
+            <h2>🏠 Soluções práticas para sua casa</h2>
+            <p>Ferramentas, utilidades domésticas e produtos selecionados com excelente custo-benefício.</p>
+        </section>
+
+        <div class="busca-container">
+            <input type="text" id="pesquisa" placeholder="🔎 Pesquise um produto..." onkeyup="aplicarFiltros()">
+        </div>
+
+        <div id="contador" class="contador"></div>
+        <div id="produtos" class="produtos"></div>
+
+        <div id="container-mostrar-mais" class="container-mostrar-mais" style="display: none;">
+            <button id="btn-mostrar-mais" onclick="carregarMais()">Mostrar Mais</button>
+        </div>
+    </main>
+</div>
+
+<footer>
+    Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
+</footer>
+
+<script>
+let categoriaSelecionada = "todos";
+let limiteItens = 12; 
+const incrementoLote = 12; 
+let usuarioAtual = null;
+let meusFavoritos = [];
+let modoFavoritosAtivo = false;
+let isCadastro = false;
+
+// Monitorar estado de autenticação do Firebase
+setTimeout(() => {
+    if (window.authFns && window.firebaseAuth) {
+        window.authFns.onAuthStateChanged(window.firebaseAuth, async (user) => {
+            usuarioAtual = user;
+            const labelConta = document.getElementById("label-conta");
+            if (user) {
+                labelConta.innerText = user.email.split('@')[0];
+                document.getElementById("auth-form-container").style.display = "none";
+                document.getElementById("auth-user-container").style.display = "block";
+                document.getElementById("user-email-display").innerText = user.email;
+                await carregarFavoritosNuvem();
+            } else {
+                labelConta.innerText = "Minha Conta";
+                document.getElementById("auth-form-container").style.display = "block";
+                document.getElementById("auth-user-container").style.display = "none";
+                meusFavoritos = [];
+                aplicarFiltros();
+            }
+        });
+    }
+}, 1000);
+
+async function carregarFavoritosNuvem() {
+    if (!usuarioAtual) return;
+    try {
+        const docRef = window.dbFns.doc(window.firebaseDb, "favoritos", usuarioAtual.uid);
+        const docSnap = await window.dbFns.getDoc(docRef);
+        if (docSnap.exists()) {
+            meusFavoritos = docSnap.data().itens || [];
+        } else {
+            meusFavoritos = [];
+        }
+        aplicarFiltros();
+    } catch (e) {
+        console.error("Erro ao carregar favoritos:", e);
+    }
+}
+
+async function alternarFavorito(nomeProduto, btnElement) {
+    if (!usuarioAtual) {
+        alert("Faça login na sua conta para salvar produtos nos favoritos!");
+        abrirModalConta();
+        return;
+    }
+
+    const docRef = window.dbFns.doc(window.firebaseDb, "favoritos", usuarioAtual.uid);
+    try {
+        if (meusFavoritos.includes(nomeProduto)) {
+            meusFavoritos = meusFavoritos.filter(item => item !== nomeProduto);
+            await window.dbFns.setDoc(docRef, { itens: meusFavoritos }, { merge: true });
+            btnElement.classList.remove("favoritado");
+        } else {
+            meusFavoritos.push(nomeProduto);
+            await window.dbFns.setDoc(docRef, { itens: meusFavoritos }, { merge: true });
+            btnElement.classList.add("favoritado");
+        }
+        if (modoFavoritosAtivo) aplicarFiltros();
+    } catch (e) {
+        console.error("Erro ao atualizar favorito:", e);
+    }
+}
+
+function filtrarFavoritos() {
+    if (!usuarioAtual) {
+        alert("Faça login para ver seus favoritos!");
+        abrirModalConta();
+        return;
+    }
+    modoFavoritosAtivo = !modoFavoritosAtivo;
+    const btnFavHeader = document.querySelector(".header-acoes .acao-item:nth-child(2)");
+    if (modoFavoritosAtivo) {
+        btnFavHeader.style.color = "#e74c3c";
+        categoriaSelecionada = "todos";
+    } else {
+        btnFavHeader.style.color = "#6b5b4f";
+    }
+    aplicarFiltros();
+}
+
+function abrirQuemSomos() { document.getElementById("modalQuemSomos").style.display = "flex"; }
+function fecharQuemSomos() { document.getElementById("modalQuemSomos").style.display = "none"; }
+function abrirModalConta() { document.getElementById("modalConta").style.display = "flex"; }
+function fecharModalConta() { document.getElementById("modalConta").style.display = "none"; }
+
+function alternarModoAuth() {
+    isCadastro = !isCadastro;
+    document.getElementById("auth-titulo").innerText = isCadastro ? "Criar Nova Conta" : "Entrar na sua Conta";
+    document.getElementById("btn-submit-auth").innerText = isCadastro ? "Cadastrar" : "Entrar";
+    document.getElementById("auth-toggle-text").innerText = isCadastro ? "Já tem uma conta?" : "Não tem uma conta?";
+    document.querySelector(".auth-toggle a").innerText = isCadastro ? "Faça login" : "Cadastre-se";
+}
+
+async function realizarAutenticacao() {
+    const email = document.getElementById("auth-email").value;
+    const senha = document.getElementById("auth-password").value;
+    try {
+        if (isCadastro) {
+            await window.authFns.createUserWithEmailAndPassword(window.firebaseAuth, email, senha);
+            alert("Conta criada com sucesso!");
+        } else {
+            await window.authFns.signInWithEmailAndPassword(window.firebaseAuth, email, senha);
+        }
+        fecharModalConta();
+    } catch (e) {
+        alert("Erro na autenticação: " + e.message);
+    }
+}
+
+async function fazerLogout() {
+    await window.authFns.signOut(window.firebaseAuth);
+    fecharModalConta();
+    modoFavoritosAtivo = false;
+    aplicarFiltros();
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains("modal-overlay")) {
+        event.target.style.display = "none";
+    }
+}
+
+function aplicarFiltros() {
+    const filtro = document.getElementById("pesquisa").value.toLowerCase();
+    const criterioOrdenacao = document.getElementById("ordenacao").value;
+    const containerProdutos = document.getElementById("produtos");
+    const containerBtnMais = document.getElementById("container-mostrar-mais");
+    
+    const cards = Array.from(containerProdutos.querySelectorAll(".card"));
+    let visiveis = 0;
+    let exibidosContador = 0;
+    
+    const estaFiltrando = filtro !== "" || categoriaSelecionada !== "todos" || modoFavoritosAtivo;
+
+    cards.sort((a, b) => {
+        if (criterioOrdenacao === "az") {
+            const nomeA = a.querySelector("h3").innerText.toLowerCase();
+            const nomeB = b.querySelector("h3").innerText.toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        } 
+        else if (criterioOrdenacao === "menor-maior") {
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoA - precoB;
+        }
+        else if (criterioOrdenacao === "maior-menor") {
+            const precoA = parseFloat(a.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const precoB = parseFloat(b.querySelector(".preco").innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            return precoB - precoA;
+        }
+        return 0;
+    });
+
+    cards.forEach(produto => {
+        const nomeProd = produto.querySelector("h3").innerText;
+        const texto = produto.innerText.toLowerCase();
+        const atendePesquisa = texto.includes(filtro);
+        const atendeCategoria = categoriaSelecionada === "todos" || produto.dataset.categoria === categoriaSelecionada;
+        const atendeFavorito = !modoFavoritosAtivo || meusFavoritos.includes(nomeProd);
+
+        if(atendePesquisa && atendeCategoria && atendeFavorito){
+            visiveis++;
+            if (!estaFiltrando) {
+                if (exibidosContador < limiteItens) {
+                    produto.style.display = "";
+                    exibidosContador++;
+                } else {
+                    produto.style.display = "none";
+                }
+            } else {
+                produto.style.display = "";
+            }
+        } else {
+            produto.style.display = "none";
+        }
+    });
+
+    cards.forEach(card => containerProdutos.appendChild(card));
+
+    if (!estaFiltrando && visiveis > limiteItens) {
+        containerBtnMais.style.display = "block";
+    } else {
+        containerBtnMais.style.display = "none";
+    }
+
+    const contador = document.getElementById("contador");
+    if(contador){
+        const totalMostrados = estaFiltrando ? visiveis : Math.min(visiveis, limiteItens);
+        contador.innerText = modoFavoritosAtivo ? `Exibindo ${visiveis} produto(s) favorito(s)` : `${totalMostrados} de ${visiveis} produto(s) encontrado(s)`;
+    }
+}
+
+function carregarMais() {
+    limiteItens += incrementoLote;
+    aplicarFiltros();
+}
+
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_87wFOqu4gttxm7EfHlcwCrmWYss5QJ-9FxHbyIg-vBOM4QAKHJ1YYZ2EB3GA9AZbDiZokCO86OcP/pub?output=csv";
+
+fetch(CSV_URL)
+.then(resp => resp.text())
+.then(data => {
+    const linhas = data.trim().split("\n").slice(1);
+
+    linhas.forEach(linha => {
+        const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if(!colunas || colunas.length < 5) return;
+
+        const nome = colunas[0].replaceAll('"','').trim();
+        const imagem = colunas[1].replaceAll('"','').trim();
+        const preco = colunas[2].replaceAll('"','').trim();
+        const link = colunas[3].replaceAll('"','').trim();
+        const categoria = colunas[4].replaceAll('"','').trim().toLowerCase();
+
+        const textoMsg = encodeURIComponent(`🔥 Olha essa oferta imperdível no Lar Prático!\n\n*${nome}*\nPor apenas *${preco}*\n\nConfira aqui: ${link}`);
+        const isFav = meusFavoritos.includes(nome) ? "favoritado" : "";
+
+        document.getElementById("produtos").innerHTML += `
+            <div class="card produto" data-categoria="${categoria}">
+                <img src="${imagem}" alt="${nome}">
+                <div class="info">
+                    <div class="selo">Oferta Especial</div>
+                    <h3>${nome}</h3>
+                    <div class="preco">${preco}</div>
+                    <div class="parcela">Confira disponibilidade e condições atualizadas</div>
+                    <div class="botoes-acao">
+                        <a href="${link}" target="_blank" class="botao">🛒 Ver Oferta</a>
+                        <button class="botao-favorito ${isFav}" onclick="alternarFavorito('${nome.replaceAll("'", "\\'")}', this)" title="Salvar nos Favoritos">
+                            ❤️
+                        </button>
+                        <a href="https://api.whatsapp.com/send?text=${textoMsg}" target="_blank" class="botao-whatsapp" title="Compartilhar no WhatsApp">
+                            <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    aplicarFiltros();
+})
+.catch(error => {
+    document.getElementById("produtos").innerHTML = `
+        <p style="text-align:center;color:red;">Não foi possível carregar os produtos.</p>
+    `;
+    console.error(error);
+});
+
+document.addEventListener("click", function(e){
+    if(!e.target.classList.contains("filtro")) return;
+    document.querySelectorAll(".filtro").forEach(btn => btn.classList.remove("ativo"));
+    e.target.classList.add("ativo");
+    categoriaSelecionada = e.target.dataset.categoria;
+    modoFavoritosAtivo = false;
+    document.querySelector(".header-acoes .acao-item:nth-child(2)").style.color = "#6b5b4f";
+    limiteItens = 12; 
+    aplicarFiltros();
+});
+</script>
+
+</body>
+</html>
