@@ -81,7 +81,7 @@ header {
 /* Navegação do Cabeçalho */
 .header-nav {
     display: flex;
-    gap: 25px;
+    gap: 30px;
     list-style: none;
     align-items: center;
 }
@@ -92,6 +92,7 @@ header {
     font-weight: 600;
     font-size: 15px;
     transition: 0.2s;
+    cursor: pointer;
 }
 
 .header-nav a:hover, .header-nav a.ativo {
@@ -123,6 +124,68 @@ header {
 .acao-item span {
     font-size: 20px;
     margin-bottom: 2px;
+}
+
+/* Modal / Janela Quem Somos */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #fff;
+    max-width: 600px;
+    width: 100%;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h2 {
+    color: #a35732;
+    margin-bottom: 15px;
+    font-size: 22px;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 10px;
+}
+
+.modal-content p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.modal-fechar {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #777;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-fechar:hover {
+    color: #a35732;
 }
 
 /* Layout Principal com Sidebar */
@@ -478,9 +541,8 @@ footer{
 
         <!-- Centro: Menu de Navegação Rápida -->
         <ul class="header-nav">
-            <li><a href="#" class="ativo">Início</a></li>
-            <li><a href="#produtos">Ofertas</a></li>
-            <li><a href="#">Sobre Nós</a></li>
+            <li><a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="ativo">Início</a></li>
+            <li><a onclick="abrirQuemSomos()">Quem Somos</a></li>
         </ul>
 
         <!-- Direita: Atalhos de Conta e Favoritos -->
@@ -496,6 +558,18 @@ footer{
         </div>
     </div>
 </header>
+
+<!-- Janela Modal "Quem Somos" -->
+<div id="modalQuemSomos" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-fechar" onclick="fecharQuemSomos()">&times;</button>
+        <h2>🏠 Quem Somos - Lar Prático</h2>
+        <p>Bem-vindo ao <strong>Lar Prático</strong>! Nossa missão é simplificar a sua rotina e transformar a sua casa em um ambiente mais funcional, confortável e aconchegante.</p>
+        <p>Buscamos e selecionamos cuidadosamente utilidades domésticas, ferramentas, eletrônicos e soluções de excelente custo-benefício para que você encontre exatamente o que precisa, sem perder tempo comparando centenas de opções na internet.</p>
+        <p>Trabalhamos com links recomendados das melhores plataformas do mercado. Ao adquirir um produto pelos nossos links, você apoia o nosso trabalho de curadoria sem pagar absolutamente nada a mais por isso.</p>
+        <p>Obrigado por confiar no <strong>Lar Prático</strong> para fazer parte do seu dia a dia!</p>
+    </div>
+</div>
 
 <div class="layout-principal">
     <!-- Menu Lateral Esquerdo com rolagem independente -->
@@ -566,14 +640,30 @@ footer{
 </div>
 
 <footer>
-    Este site é um afiliado autorizado Mercadolivre. Todas as compras são protegidas e garantidas pelo Mercadolivre.
-    Site elaborado por: Rafael Caetani
+    Alguns links podem gerar comissão de afiliado sem custo adicional para você. 
 </footer>
 
 <script>
 let categoriaSelecionada = "todos";
 let limiteItens = 12; 
 const incrementoLote = 12; 
+
+// Funções para controlar a Janela "Quem Somos"
+function abrirQuemSomos() {
+    document.getElementById("modalQuemSomos").style.display = "flex";
+}
+
+function fecharQuemSomos() {
+    document.getElementById("modalQuemSomos").style.display = "none";
+}
+
+// Fechar modal ao clicar fora da caixa
+window.onclick = function(event) {
+    const modal = document.getElementById("modalQuemSomos");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+}
 
 function aplicarFiltros() {
     const filtro = document.getElementById("pesquisa").value.toLowerCase();
