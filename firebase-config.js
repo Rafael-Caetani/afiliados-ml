@@ -5,12 +5,12 @@ import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove }
 
 // Configuração do seu projeto no Firebase
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY_REAL",
+    apiKey: "AIzaSyB9_B046JCpm4ebgDNaigKue538OVK7afI",
     authDomain: "larpratico-ee811.firebaseapp.com",
     projectId: "larpratico-ee811",
     storageBucket: "larpratico-ee811.appspot.com",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    messagingSenderId: "871328846510",
+    appId: "1:871328846510:web:77e95be6500e6a8501d33f",
 };
 
 // Inicializando o Firebase e disponibilizando as funções globalmente para o index.html
